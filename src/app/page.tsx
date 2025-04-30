@@ -104,10 +104,22 @@ export default function Home() {
           <div className="col-span-12 lg:col-span-6 flex justify-center items-center">
             <div className="relative w-full max-w-[400px]">
               <div className="relative">
+                {/* Effet de flou de fond (comme la nav) */}
+                <div
+                  className="absolute -z-10 backdrop-blur-md bg-black/15"
+                  style={{
+                    top: '0%',
+                    left: '1%',
+                    right: '1%',
+                    bottom: '0%',
+                    borderRadius: '56px'
+                  }}
+                ></div>
+                {/* iPhone principal au premier plan */}
                 <img
                   src="/iphoneKlikx.svg"
                   alt="iPhone Klikx"
-                  className="w-full h-auto"
+                  className="w-full h-auto relative z-10"
                 />
               </div>
             </div>
