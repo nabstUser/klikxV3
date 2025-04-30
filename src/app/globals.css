@@ -1,0 +1,244 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Animation de la flèche diagonale */
+.diag-arrow-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.diag-arrow {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.diag-arrow-duplicate {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: translate(-100%, 100%);
+  transition: all 0.3s ease;
+}
+
+/* Animation au survol */
+.diag-arrow-wrapper:hover .diag-arrow {
+  transform: translate(2px, -2px);
+}
+
+.diag-arrow-wrapper:hover .diag-arrow-duplicate {
+  opacity: 0.6;
+  transform: translate(0, 0);
+}
+
+/* Variante pour les flèches plus petites */
+.diag-arrow-small {
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.diag-arrow-wrapper:hover .diag-arrow-small {
+  transform: translate(1px, -1px) scale(1.1);
+}
+
+/* Variante pour boutons avec bordure arrondie */
+.rounded-btn .diag-arrow,
+.rounded-btn .diag-arrow-duplicate {
+  margin-left: 4px;
+}
+
+/* Animation pour les boutons avec classe "group" */
+.group:hover .group-diag-arrow {
+  transform: translate(3px, -3px);
+}
+
+.group:hover .group-diag-duplicate {
+  opacity: 0.6;
+  transform: translate(0, 0);
+}
+
+/* Animation de flèche Foundation */
+.arrow-button-wrapper {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.arrow-button-wrapper.size-small {
+  width: 16px;
+  height: 13px;
+}
+
+.arrow-button-wrapper.size-medium {
+  width: 24px;
+  height: 20px;
+}
+
+.arrow-button-wrapper.size-large {
+  width: 32px;
+  height: 28px;
+}
+
+.arrow-animation-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-main,
+.arrow-secondary {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arrow-main {
+  opacity: 1;
+}
+
+.arrow-secondary {
+  opacity: 0;
+}
+
+/* Size-specific styles */
+.size-small .arrow-main,
+.size-small .arrow-secondary {
+  width: 8px;
+  height: 8px;
+}
+
+.size-medium .arrow-main,
+.size-medium .arrow-secondary {
+  width: 12px;
+  height: 12px;
+}
+
+.size-large .arrow-main,
+.size-large .arrow-secondary {
+  width: 16px;
+  height: 16px;
+}
+
+/* Animation triggers */
+.arrow-button-wrapper:hover .arrow-main,
+.group:hover .arrow-button-wrapper .arrow-main {
+  opacity: 0;
+  transform: translate(100%, -100%);
+}
+
+.arrow-button-wrapper:hover .arrow-secondary,
+.group:hover .arrow-button-wrapper .arrow-secondary {
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+
+/* Override hover background color changes */
+.bg-\[\#7790ED\].group:hover {
+  background-color: #7790ED !important;
+}
+
+/* Size-specific animation adjustments - sortie */
+.size-small:hover .arrow-main,
+.group:hover .size-small .arrow-main {
+  transform: translate(100%, -100%);
+}
+
+.size-medium:hover .arrow-main,
+.group:hover .size-medium .arrow-main {
+  transform: translate(100%, -100%);
+}
+
+.size-large:hover .arrow-main,
+.group:hover .size-large .arrow-main {
+  transform: translate(100%, -100%);
+}
+
+/* Secondary arrow initial position */
+.size-small .arrow-secondary {
+  transform: translate(-150%, 50%);
+}
+
+.size-medium .arrow-secondary {
+  transform: translate(-150%, 50%);
+}
+
+.size-large .arrow-secondary {
+  transform: translate(-150%, 50%);
+}
