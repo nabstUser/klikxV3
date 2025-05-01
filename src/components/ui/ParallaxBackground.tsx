@@ -66,7 +66,7 @@ export default function ParallaxBackground({
           backgroundImage: `url(${src})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          // Scale plus grande pour éviter les bords vides lors du mouvement
+          // Scale plus petite pour réduire le zoom tout en évitant les bords vides
           scale: 1.15,
         }}
         aria-label={alt}

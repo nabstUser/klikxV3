@@ -756,16 +756,18 @@ export default function Home() {
       {/* Contact Section */}
       <section
         id="contact"
-        className="min-h-screen relative overflow-hidden text-lg flex items-center"
+        className="min-h-screen relative overflow-hidden text-lg flex items-center py-40"
         style={{ backgroundColor: "#333" }}
       >
-        {/* Parallax background */}
-        <ParallaxBackground
-          src="/contactSection.jpg"
-          strength={9}
-          direction="up"
-          className="z-0 scale-[1.1]"
-        />
+        {/* Conteneur de l'image avec position absolue modifiée pour commencer encore plus haut */}
+        <div className="absolute inset-0" style={{ top: "-200px", bottom: "-20px", left: 0, right: 0 }}>
+          <ParallaxBackground
+            src="/contactSection.jpg"
+            strength={9}
+            direction="up"
+            className="z-0 scale-[1.2]"
+          />
+        </div>
 
         <div className="container mx-auto px-4 z-10">
           <div className="grid grid-cols-12">
@@ -781,8 +783,8 @@ export default function Home() {
                   delay={0.2}
                 />
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center mb-12 space-y-3 sm:space-y-0">
-                  <ScrollReveal delay={0.3}>
+                <ScrollReveal delay={0.3}>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center mb-16 space-y-2 sm:space-y-0 sm:space-x-2">
                     <a
                       href="mailto:contact@klikx.agency"
                       className="inline-flex items-center bg-white/20 text-white px-4 py-2 rounded-full transition-colors group"
@@ -792,30 +794,28 @@ export default function Home() {
                         <FoundationArrow darkMode={false} size="small" />
                       </div>
                     </a>
-                  </ScrollReveal>
-                  <ScrollReveal delay={0.4}>
                     <a
                       href="tel:+41795232242"
-                      className="inline-flex items-center bg-white/20 text-white px-4 py-2 rounded-full transition-colors sm:ml-2"
+                      className="inline-flex items-center bg-white/20 text-white px-4 py-2 rounded-full transition-colors mt-2 sm:mt-0"
                     >
                       +41 79 523 22 42
                     </a>
-                  </ScrollReveal>
-                </div>
-
-                <div className="w-full h-px bg-white/20 mb-6" />
-
-                <ScrollReveal delay={0.5}>
-                  <h2 className="text-2xl font-medium text-white mb-6">
-                    Contactez-nous maintenant
-                  </h2>
+                  </div>
                 </ScrollReveal>
 
                 <div className="w-full h-px bg-white/20 mb-8" />
 
-                <div className="space-y-8">
+                <ScrollReveal delay={0.5}>
+                  <h2 className="text-2xl font-medium text-white mb-8">
+                    Contactez-nous maintenant
+                  </h2>
+                </ScrollReveal>
+
+                <div className="w-full h-px bg-white/20 mb-12" />
+
+                <div className="space-y-12">
                   <ScrollReveal delay={0.6}>
-                    <p className="text-white/80 mb-6">
+                    <p className="text-white/80 mb-8">
                       Vos informations
                     </p>
                   </ScrollReveal>

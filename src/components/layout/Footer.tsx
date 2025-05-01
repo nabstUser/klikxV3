@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-white text-gray-800 py-16">
+    <footer className="bg-white text-gray-800 py-16 relative">
       <div className="container mx-auto px-4">
         <div className="border-t border-gray-300 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-600 text-sm mb-4 md:mb-0">© 2025 Klikx. Tous droits réservés.</p>
