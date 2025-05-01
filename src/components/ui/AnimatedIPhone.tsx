@@ -23,15 +23,54 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
   const [showGlow, setShowGlow] = useState(false);
   const [animateBottomStats, setAnimateBottomStats] = useState(false);
 
+  // Pour l'animation du tracé du graphique
+  const [graphProgress, setGraphProgress] = useState(0);
+
+  // États pour contrôler les animations séquentielles
+  const [titleVisible, setTitleVisible] = useState(false);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const [bottomTextVisible, setBottomTextVisible] = useState(false);
+
+  // État pour contrôler l'animation en boucle du graphique
+  const [loopCount, setLoopCount] = useState(0);
+
   const svgRef = useRef<SVGSVGElement | null>(null);
+
+  // Utiliser une valeur fixe pour la longueur du chemin au lieu d'essayer de la calculer dynamiquement
+  // car la méthode getTotalLength() pourrait ne pas être disponible immédiatement
+  const graphPathLength = 1000; // Une valeur approximative qui fonctionne bien pour ce graphique
 
   // Format number with apostrophe as thousand separator
   const formatNumber = (num: number): string => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
   };
 
-  // Animation effect
+  // Animation effect in sequence: title -> stats -> bottomText
   useEffect(() => {
+    // Animer les différentes parties dans l'ordre
+    const titleDelay = 500; // Délai avant d'afficher le titre
+    const statsDelay = 500; // Délai réduit avant d'animer les stats après le titre (était 1000ms)
+    const bottomTextDelay = 1500; // Délai avant d'animer le texte du bas après les stats (était 2000ms)
+
+    // Montrer le titre après un court délai
+    setTimeout(() => {
+      setTitleVisible(true);
+    }, titleDelay);
+
+    // Lancer l'animation des stats après le titre
+    setTimeout(() => {
+      setStatsVisible(true);
+      animateStats();
+    }, titleDelay + statsDelay);
+
+    // Afficher le texte du bas à la fin
+    setTimeout(() => {
+      setBottomTextVisible(true);
+    }, titleDelay + statsDelay + bottomTextDelay);
+  }, []);
+
+  // Fonction pour animer les statistiques
+  const animateStats = () => {
     // Target values for main stats
     const targetMainAmount = 93958;
     const targetPreviousAmount = 67860;
@@ -62,27 +101,73 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
       setCurrentAmount(Math.round(targetCurrentAmount * easeProgress));
       setCurrentPercentage(Math.round(targetCurrentPercentage * easeProgress));
 
+      // Animate graph progress
+      setGraphProgress(easeProgress);
+
       if (frame < totalFrames) {
         requestAnimationFrame(animate);
       } else {
         // Main animation is complete
         setIsAnimationComplete(true);
 
-        // Add a slight delay before showing the glow effect and starting bottom stats animation
+        // Add a slight delay before showing the glow effect
         setTimeout(() => {
           setShowGlow(true);
           setAnimateBottomStats(true);
+
+          // Mettre en place la boucle d'animation
+          scheduleGraphReanimation();
         }, 500);
       }
     };
 
-    // Start animation after a small delay
-    const timer = setTimeout(() => {
-      animate();
-    }, 500);
+    // Start stats animation
+    animate();
+  };
 
-    return () => clearTimeout(timer);
-  }, []);
+  // Fonction pour programmer la réanimation du graphique
+  const scheduleGraphReanimation = () => {
+    // Attendre entre 8 et 12 secondes avant de relancer l'animation
+    const delay = Math.random() * 4000 + 8000; // Entre 8000ms et 12000ms
+
+    setTimeout(() => {
+      reanimateGraph();
+    }, delay);
+  };
+
+  // Fonction pour réanimer le graphique
+  const reanimateGraph = () => {
+    // Réinitialiser le graphique
+    setGraphProgress(0);
+
+    // Relancer l'animation du graphique
+    const duration = 2000; // 2 secondes pour l'animation
+    const framesPerSecond = 60;
+    const totalFrames = duration / 1000 * framesPerSecond;
+    let frame = 0;
+
+    const animateGraph = () => {
+      frame++;
+      const progress = Math.min(frame / totalFrames, 1);
+      const easeProgress = 1 - (1 - progress) ** 3; // Cubic ease-out
+
+      // Animer seulement le graphique et la ligne verticale
+      setGraphProgress(easeProgress);
+
+      if (frame < totalFrames) {
+        requestAnimationFrame(animateGraph);
+      } else {
+        // Compter le nombre de fois que l'animation s'est relancée
+        setLoopCount(count => count + 1);
+
+        // Planifier la prochaine animation
+        scheduleGraphReanimation();
+      }
+    };
+
+    // Démarrer l'animation
+    animateGraph();
+  };
 
   // Animation for bottom stats (only starts after main stats are done)
   useEffect(() => {
@@ -366,50 +451,31 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
           <path className="cls-3" d="M0,214.24h3.53v42.38H0v-42.38h0Z"/>
           <path className="cls-3" d="M313.47,188.34h3.53v64.74h-3.53v-64.74Z"/>
         </g>
-        <g id="bottomTexte">
-          <path className="cls-25" d="M251.51,372.28h25.93c6.68,0,12.1,5.42,12.1,12.1h0c0,6.68-5.42,12.1-12.1,12.1h-25.93c-6.68,0-12.1-5.42-12.1-12.1h0c0-6.68,5.42-12.1,12.1-12.1h0Z"/>
-          <text className="cls-6" transform="translate(28.63 390.94)"><tspan className="cls-1" x="0" y="0">S</tspan><tspan className="cls-20" x="8.83" y="0">t</tspan><tspan className="cls-33" x="14.9" y="0">a</tspan><tspan x="23.19" y="0">tus</tspan></text>
-          <text className="cls-6" transform="translate(28.63 422.56)"><tspan x="0" y="0">Obje</tspan><tspan className="cls-23" x="36.35" y="0">c</tspan><tspan className="cls-14" x="44.52" y="0">t</tspan><tspan x="50.51" y="0">if</tspan></text>
-          <text className="cls-6" transform="translate(186.68 422.56)"><tspan className="cls-20" x="0" y="0">C</tspan><tspan className="cls-13" x="11.72" y="0">ourte durée</tspan></text>
-          <text className="cls-6" transform="translate(28.63 451.42)"><tspan className="cls-16" x="0" y="0">T</tspan><tspan x="8.71" y="0">ype</tspan></text>
-          <text className="cls-6" transform="translate(256.26 451.42)"><tspan className="cls-32" x="0" y="0">L</tspan><tspan className="cls-13" x="8.47" y="0">o</tspan><tspan className="cls-33" x="17.77" y="0">f</tspan><tspan className="cls-26" x="23.94" y="0">t</tspan></text>
-          <text className="cls-6" transform="translate(28.63 481.02)"><tspan x="0" y="0">Prix m</tspan><tspan className="cls-33" x="46.93" y="0">o</tspan><tspan x="55.99" y="0">yen</tspan></text>
-
-          {/* Valeurs animées simples */}
-          <text className="cls-6" transform="translate(246.2 481.02)">
-            <tspan x="0" y="0">{`${prixMoyen} €`}</tspan>
-          </text>
-
-          <text className="cls-6" transform="translate(28.63 510.25)"><tspan className="cls-31" x="0" y="0">T</tspan><tspan x="8.47" y="0">aux d</tspan><tspan className="cls-33" x="48.94" y="0">'</tspan><tspan className="cls-13" x="52.84" y="0">occup</tspan><tspan className="cls-33" x="98.15" y="0">at</tspan><tspan x="112.43" y="0">ion</tspan></text>
-
-          <text className="cls-6" transform="translate(255.89 510.25)">
-            <tspan x="0" y="0">{`${tauxOccupation}%`}</tspan>
-          </text>
-
-          <text className="cls-6" transform="translate(28.63 539.71)"><tspan className="cls-1" x="0" y="0">A</tspan><tspan className="cls-26" x="11.29" y="0">vis clie</tspan><tspan className="cls-20" x="59.46" y="0">n</tspan><tspan x="68.84" y="0">t</tspan></text>
-
-          <text className="cls-6" transform="translate(263.8 539.71)">
-            <tspan x="0" y="0">{avisClient.toFixed(1)}</tspan>
-          </text>
-
-          <text className="cls-6" transform="translate(28.63 568.02)"><tspan className="cls-23" x="0" y="0">R</tspan><tspan className="cls-33" x="10.14" y="0">ev</tspan><tspan className="cls-26" x="27.67" y="0">e</tspan><tspan className="cls-23" x="36.73" y="0">n</tspan><tspan x="46.18" y="0">us</tspan></text>
-
-          <text className="cls-6" transform="translate(233.76 568.02)">
-            <tspan x="0" y="0">{`${formatNumber(revenus)} €`}</tspan>
-          </text>
-
-          <text className="cls-11" transform="translate(246.51 390.29)"><tspan x="0" y="0">A</tspan><tspan className="cls-12" x="11.76" y="0">c</tspan><tspan className="cls-33" x="19.93" y="0">t</tspan><tspan x="25.91" y="0">if</tspan></text>
+        <g id="title" style={{ opacity: titleVisible ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}>
+          <text className="cls-4" transform="translate(28.63 89.19)"><tspan x="0" y="0">28 Rue des Archi</tspan><tspan className="cls-15" x="139.76" y="0">v</tspan><tspan className="cls-30" x="149.58" y="0">es</tspan></text>
+          <text className="cls-6" transform="translate(28.63 108.07)"><tspan className="cls-1" x="0" y="0">7</tspan><tspan className="cls-26" x="7.83" y="0">50</tspan><tspan className="cls-22" x="25.79" y="0">0</tspan><tspan x="34.47" y="0">3 </tspan><tspan className="cls-34" x="47.05" y="0">P</tspan><tspan x="56.84" y="0">aris</tspan></text>
+          <circle id="infoBcg" className="cls-8" cx="273.05" cy="91.09" r="16.1"/>
+          <circle id="klikxBcg" className="cls-8" cx="236.06" cy="91.09" r="16.1"/>
+          <g id="infosIcon">
+            <circle className="cls-17" cx="273.05" cy="91.09" r="8.2"/>
+            <path className="cls-3" d="M272.96,87.46c-.19,0-.35-.07-.48-.2s-.2-.3-.2-.49.07-.35.2-.49c.13-.13.29-.2.48-.2s.36.07.49.2.2.29.2.49-.07.35-.2.49-.3.2-.49.2ZM273.59,95.36h-1.25v-6.12h1.25v6.12Z"/>
+          </g>
+          <g id="klikx">
+            <path className="cls-3" d="M244.27,99.29h-16.41v-16.41h16.41v16.41ZM228.58,98.57h14.97v-14.97h-14.97v14.97Z"/>
+            <polygon className="cls-3" points="238.75 96.22 237.73 96.22 235.45 93.48 234.22 94.79 233.37 94.79 233.37 85.96 234.16 85.96 234.16 93.91 234.8 93.13 237.39 90.39 238.36 90.39 236 92.9 238.75 96.22"/>
+          </g>
         </g>
-        <g id="stats">
+
+        <g id="stats" style={{ opacity: statsVisible ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}>
           <rect id="statsBgc" className="cls-24" x="9.72" y="133.5" width="297.11" height="219.45" rx="3.55" ry="3.55"/>
           <path
             id="statsGraph"
             className="cls-19"
             d="M159.07,200.03c.73-1.09,1.78-2.75,2.85-4.9,1.01-2.04,1.3-3.04,1.94-3.08,1.51-.09,2.02,5.47,4.44,5.81,1.2.17,2.34-1.02,3.76-2.51,2.44-2.55,2.22-4.05,3.87-4.78,2.17-.96,4.79.64,5.24.91,2.11,1.29,2.79,3.09,4.33,6.15,2.95,5.89,5.08,10.14,7.06,10.03.35-.02,1.23-.21,3.3-4.78,2.38-5.24,2.51-7.8,4.78-14.01.24-.64.92-2.29,2.28-5.58,3.25-7.85,3.95-9.11,5.01-9.23,2.43-.26,3.94,5.73,5.92,5.35,1.46-.28,1.6-3.71,4.44-11.05,1.31-3.38,1.97-4.43,2.73-4.44,1.88-.02,2.44,6.3,5.13,6.61,1.75.2,2.28-2.39,4.78-2.62,2.51-.23,3.22,2.27,6.04,2.39,2.97.13,3.53-2.58,5.92-2.39,3.53.27,3.49,6.26,8.32,7.97,2.89,1.02,4-.72,7.41.68,3.08,1.27,3.51,3.26,5.24,3.08,2.69-.29,2.83-5.18,5.7-5.81,2.81-.62,4.54,3.67,7.29,3.65,2.16-.02,5.18-2.69,8.77-14.92"
             style={{
-              strokeDasharray: isAnimationComplete ? "none" : "1000",
-              strokeDashoffset: isAnimationComplete ? "0" : "1000",
-              transition: "stroke-dashoffset 2s ease-in-out",
+              strokeDasharray: graphPathLength,
+              strokeDashoffset: graphPathLength * (1 - graphProgress),
+              transition: "none", // Pour une animation plus fluide, nous utilisons l'état pour contrôler l'animation
             }}
           />
           <g id="greenAugment">
@@ -499,21 +565,52 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
             </tspan>
           </text>
 
-          <line className="cls-17" x1="158.28" y1="248.26" x2="158.28" y2="320.45"/>
+          {/* Ligne verticale animée de bas en haut */}
+          <line
+            className="cls-17"
+            x1="158.28"
+            y1="320.45" // Point fixe en bas
+            x2="158.28"
+            y2={320.45 - (320.45 - 248.26) * graphProgress} // Point variable qui monte vers le haut
+            style={{
+              transition: "none", // Pour une animation fluide en synchronisation avec le graphique
+            }}
+          />
         </g>
-        <g id="title">
-          <text className="cls-4" transform="translate(28.63 89.19)"><tspan x="0" y="0">28 Rue des Archi</tspan><tspan className="cls-15" x="139.76" y="0">v</tspan><tspan className="cls-30" x="149.58" y="0">es</tspan></text>
-          <text className="cls-6" transform="translate(28.63 108.07)"><tspan className="cls-1" x="0" y="0">7</tspan><tspan className="cls-26" x="7.83" y="0">50</tspan><tspan className="cls-22" x="25.79" y="0">0</tspan><tspan x="34.47" y="0">3 </tspan><tspan className="cls-34" x="47.05" y="0">P</tspan><tspan x="56.84" y="0">aris</tspan></text>
-          <circle id="infoBcg" className="cls-8" cx="273.05" cy="91.09" r="16.1"/>
-          <circle id="klikxBcg" className="cls-8" cx="236.06" cy="91.09" r="16.1"/>
-          <g id="infosIcon">
-            <circle className="cls-17" cx="273.05" cy="91.09" r="8.2"/>
-            <path className="cls-3" d="M272.96,87.46c-.19,0-.35-.07-.48-.2s-.2-.3-.2-.49.07-.35.2-.49c.13-.13.29-.2.48-.2s.36.07.49.2.2.29.2.49-.07.35-.2.49-.3.2-.49.2ZM273.59,95.36h-1.25v-6.12h1.25v6.12Z"/>
-          </g>
-          <g id="klikx">
-            <path className="cls-3" d="M244.27,99.29h-16.41v-16.41h16.41v16.41ZM228.58,98.57h14.97v-14.97h-14.97v14.97Z"/>
-            <polygon className="cls-3" points="238.75 96.22 237.73 96.22 235.45 93.48 234.22 94.79 233.37 94.79 233.37 85.96 234.16 85.96 234.16 93.91 234.8 93.13 237.39 90.39 238.36 90.39 236 92.9 238.75 96.22"/>
-          </g>
+
+        <g id="bottomTexte" style={{ opacity: bottomTextVisible ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}>
+          <path className="cls-25" d="M251.51,372.28h25.93c6.68,0,12.1,5.42,12.1,12.1h0c0,6.68-5.42,12.1-12.1,12.1h-25.93c-6.68,0-12.1-5.42-12.1-12.1h0c0-6.68,5.42-12.1,12.1-12.1h0Z"/>
+          <text className="cls-6" transform="translate(28.63 390.94)"><tspan className="cls-1" x="0" y="0">S</tspan><tspan className="cls-20" x="8.83" y="0">t</tspan><tspan className="cls-33" x="14.9" y="0">a</tspan><tspan x="23.19" y="0">tus</tspan></text>
+          <text className="cls-6" transform="translate(28.63 422.56)"><tspan x="0" y="0">Obje</tspan><tspan className="cls-23" x="36.35" y="0">c</tspan><tspan className="cls-14" x="44.52" y="0">t</tspan><tspan x="50.51" y="0">if</tspan></text>
+          <text className="cls-6" transform="translate(186.68 422.56)"><tspan className="cls-20" x="0" y="0">C</tspan><tspan className="cls-13" x="11.72" y="0">ourte durée</tspan></text>
+          <text className="cls-6" transform="translate(28.63 451.42)"><tspan className="cls-16" x="0" y="0">T</tspan><tspan x="8.71" y="0">ype</tspan></text>
+          <text className="cls-6" transform="translate(256.26 451.42)"><tspan className="cls-32" x="0" y="0">L</tspan><tspan className="cls-13" x="8.47" y="0">o</tspan><tspan className="cls-33" x="17.77" y="0">f</tspan><tspan className="cls-26" x="23.94" y="0">t</tspan></text>
+          <text className="cls-6" transform="translate(28.63 481.02)"><tspan x="0" y="0">Prix m</tspan><tspan className="cls-33" x="46.93" y="0">o</tspan><tspan x="55.99" y="0">yen</tspan></text>
+
+          {/* Valeurs animées simples - alignées à droite */}
+          <text className="cls-6" transform="translate(246.2 481.02)">
+            <tspan x="40" y="0" textAnchor="end">{`${prixMoyen} €`}</tspan>
+          </text>
+
+          <text className="cls-6" transform="translate(28.63 510.25)"><tspan className="cls-31" x="0" y="0">T</tspan><tspan x="8.47" y="0">aux d</tspan><tspan className="cls-33" x="48.94" y="0">'</tspan><tspan className="cls-13" x="52.84" y="0">occup</tspan><tspan className="cls-33" x="98.15" y="0">at</tspan><tspan x="112.43" y="0">ion</tspan></text>
+
+          <text className="cls-6" transform="translate(255.89 510.25)">
+            <tspan x="30" y="0" textAnchor="end">{`${tauxOccupation}%`}</tspan>
+          </text>
+
+          <text className="cls-6" transform="translate(28.63 539.71)"><tspan className="cls-1" x="0" y="0">A</tspan><tspan className="cls-26" x="11.29" y="0">vis clie</tspan><tspan className="cls-20" x="59.46" y="0">n</tspan><tspan x="68.84" y="0">t</tspan></text>
+
+          <text className="cls-6" transform="translate(263.8 539.71)">
+            <tspan x="20" y="0" textAnchor="end">{avisClient.toFixed(1)}</tspan>
+          </text>
+
+          <text className="cls-6" transform="translate(28.63 568.02)"><tspan className="cls-23" x="0" y="0">R</tspan><tspan className="cls-33" x="10.14" y="0">ev</tspan><tspan className="cls-26" x="27.67" y="0">e</tspan><tspan className="cls-23" x="36.73" y="0">n</tspan><tspan x="46.18" y="0">us</tspan></text>
+
+          <text className="cls-6" transform="translate(233.76 568.02)">
+            <tspan x="50" y="0" textAnchor="end">{`${formatNumber(revenus)} €`}</tspan>
+          </text>
+
+          <text className="cls-11" transform="translate(246.51 390.29)"><tspan x="0" y="0">A</tspan><tspan className="cls-12" x="11.76" y="0">c</tspan><tspan className="cls-33" x="19.93" y="0">t</tspan><tspan x="25.91" y="0">if</tspan></text>
         </g>
       </svg>
     </div>
