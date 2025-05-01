@@ -21,24 +21,24 @@ export default function PricingTabs({ onPlanChange }: PricingTabsProps) {
 
   const pricingData = {
     basic: {
-      price: "CHF 299",
+      price: "CHF 249",
       description: "Rendu standard pour petits espaces",
       revisions: "1",
-      details: "standard",
+      details: "JPEG optimisé pour Airbnb",
       delivery: "Sous 7 jours"
     },
     premium: {
       price: "CHF 399",
       description: "Rendu détaillé pour appartements T2/T3",
       revisions: "2",
-      details: "ipsum",
+      details: "JPEG optimisé pour Airbnb",
       delivery: "Sous 5 jours"
     },
     deluxe: {
       price: "CHF 599",
       description: "Rendu haute définition pour grands espaces",
       revisions: "3",
-      details: "premium",
+      details: "JPEG Airbnb + Réseaux sociaux",
       delivery: "Sous 3 jours"
     }
   };
@@ -105,7 +105,7 @@ export default function PricingTabs({ onPlanChange }: PricingTabsProps) {
           <div className="md:pl-6">
             {/* Ajout de marge négative pour rapprocher encore plus du séparateur */}
             <div className="-mt-1 md:mt-0">
-              <h4 className="font-bold mb-1 text-gray-700">Lorem</h4>
+              <h4 className="font-bold mb-1 text-gray-700">Formats livrés</h4>
               <p className="text-gray-600">{currentPlan.details}</p>
             </div>
 
@@ -115,7 +115,7 @@ export default function PricingTabs({ onPlanChange }: PricingTabsProps) {
             <div className="mt-8 md:mt-0">
               <a
                 href="#contact"
-                className="bg-[#7790ED] text-white py-3 px-6 flex items-center justify-center w-full rounded-md hover:bg-[#4a48e0] transition-colors group"
+                className="bg-[#7790ED] text-white py-3 px-6 flex items-center justify-center w-full rounded-md transition-colors group"
               >
                 <span>Obtenez votre visuel</span>
                 <div className="ml-2">

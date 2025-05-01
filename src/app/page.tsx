@@ -13,6 +13,7 @@ import { AnimatedIPhone } from "@/components/ui/AnimatedIPhone";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import TextReveal from "@/components/ui/TextReveal";
 import CountUp from "@/components/ui/CountUp";
+import ContactForm from "@/components/ContactForm";
 
 export default function Home() {
   const [activePlan, setActivePlan] = useState('premium');
@@ -602,8 +603,8 @@ export default function Home() {
                   delay={0.2}
                 />
 
-                <div className="flex flex-wrap gap-4 items-center mb-12">
-                  <ScrollReveal delay={0.3}>
+                <div className="flex flex-nowrap items-center mb-12">
+                  <ScrollReveal delay={0.3} className="inline-flex">
                     <a
                       href="mailto:contact@klikx.agency"
                       className="inline-flex items-center bg-white/20 text-white px-4 py-2 rounded-full transition-colors group"
@@ -613,12 +614,9 @@ export default function Home() {
                         <FoundationArrow darkMode={false} size="small" />
                       </div>
                     </a>
-                  </ScrollReveal>
-
-                  <ScrollReveal delay={0.4}>
                     <a
                       href="tel:+41795232242"
-                      className="bg-white/20 text-white px-4 py-2 rounded-full transition-colors"
+                      className="inline-flex items-center bg-white/20 text-white px-4 py-2 rounded-full transition-colors ml-2"
                     >
                       +41 79 523 22 42
                     </a>
@@ -642,50 +640,9 @@ export default function Home() {
                     </p>
                   </ScrollReveal>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
-                    <ScrollReveal delay={0.7}>
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          placeholder="Nom"
-                          className="w-full bg-transparent border-b border-white/20 text-white placeholder-white/50 pb-2 focus:outline-none focus:border-white transition-colors"
-                        />
-                      </div>
-                    </ScrollReveal>
-
-                    <ScrollReveal delay={0.8}>
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          placeholder="Prénom"
-                          className="w-full bg-transparent border-b border-white/20 text-white placeholder-white/50 pb-2 focus:outline-none focus:border-white transition-colors"
-                        />
-                      </div>
-                    </ScrollReveal>
-
-                    <div className="space-y-2 md:col-span-2">
-                      <ScrollReveal delay={0.9}>
-                        <input
-                          type="email"
-                          placeholder="Email"
-                          className="w-full bg-transparent border-b border-white/20 text-white placeholder-white/50 pb-2 focus:outline-none focus:border-white transition-colors"
-                        />
-                      </ScrollReveal>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end mt-12">
-                    <ScrollReveal delay={1}>
-                      <button
-                        className="bg-white text-black py-3 px-6 rounded-full font-medium flex items-center justify-center group transition-all"
-                      >
-                        <span>Commencer</span>
-                        <div className="ml-2">
-                          <FoundationArrow darkMode={true} size="small" />
-                        </div>
-                      </button>
-                    </ScrollReveal>
-                  </div>
+                  <ScrollReveal delay={0.7}>
+                    <ContactForm />
+                  </ScrollReveal>
                 </div>
               </div>
             </div>
