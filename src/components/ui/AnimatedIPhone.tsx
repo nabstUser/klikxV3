@@ -3,9 +3,15 @@ import { useEffect, useState, useRef } from 'react';
 
 interface AnimatedIPhoneProps {
   className?: string;
+  initialDelay?: number; // Délai initial avant de démarrer l'animation (en ms)
+  loadingComplete?: boolean; // Indicateur que le chargement est terminé
 }
 
-export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => {
+export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({
+  className,
+  initialDelay = 800, // Délai par défaut après le chargement
+  loadingComplete = false // Par défaut, considère que le chargement n'est pas terminé
+}) => {
   // État pour les statistiques principales
   const [mainAmount, setMainAmount] = useState(0);
   const [previousAmount, setPreviousAmount] = useState(0);
@@ -47,30 +53,36 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
 
   // Animation effect in sequence: title -> stats -> bottomText
   useEffect(() => {
-    // Animer les différentes parties dans l'ordre
-    const titleDelay = 300; // Délai avant d'afficher le titre (était 500ms)
-    const statsDelay = 300; // Délai réduit avant d'animer les stats après le titre (était 500ms)
-    const bottomTextDelay = 1200; // Délai augmenté avant d'animer le texte du bas après les stats (était 800ms)
+    // On ne déclenche l'animation que si loadingComplete est true
+    if (!loadingComplete) return;
 
-    // Montrer le titre après un court délai
+    // Une fois que le chargement est terminé, démarrer l'animation après un court délai
     setTimeout(() => {
-      setTitleVisible(true);
-    }, titleDelay);
+      // Animer les différentes parties dans l'ordre
+      const titleDelay = 300; // Délai avant d'afficher le titre (était 500ms)
+      const statsDelay = 300; // Délai réduit avant d'animer les stats après le titre (était 500ms)
+      const bottomTextDelay = 1200; // Délai augmenté avant d'animer le texte du bas après les stats (était 800ms)
 
-    // Lancer l'animation des stats après le titre
-    setTimeout(() => {
-      setStatsVisible(true);
-      animateStats();
-    }, titleDelay + statsDelay);
+      // Montrer le titre après un court délai
+      setTimeout(() => {
+        setTitleVisible(true);
+      }, titleDelay);
 
-    // Afficher le texte du bas à la fin avec un délai plus long
-    setTimeout(() => {
-      setBottomTextVisible(true);
+      // Lancer l'animation des stats après le titre
+      setTimeout(() => {
+        setStatsVisible(true);
+        animateStats();
+      }, titleDelay + statsDelay);
 
-      // Déclencher l'animation des stats du bas
-      setAnimateBottomStats(true);
-    }, titleDelay + statsDelay + bottomTextDelay);
-  }, []);
+      // Afficher le texte du bas à la fin avec un délai plus long
+      setTimeout(() => {
+        setBottomTextVisible(true);
+        // Déclencher l'animation des stats du bas
+        setAnimateBottomStats(true);
+      }, titleDelay + statsDelay + bottomTextDelay);
+
+    }, initialDelay); // Utiliser le délai initial avant de démarrer la séquence complète
+  }, [loadingComplete, initialDelay]);
 
   // Fonction pour animer les statistiques
   const animateStats = () => {

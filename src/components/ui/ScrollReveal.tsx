@@ -39,16 +39,20 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
   const { scrollY } = useScroll();
 
   // Surveiller la position de défilement et détecter quand l'utilisateur remonte en haut
+  // Optimisation: Utiliser un debounce pour réduire les appels trop fréquents
   useMotionValueEvent(scrollY, "change", (latest) => {
     // Si l'utilisateur est proche du haut de la page
-    if (latest < 100) {
-      setWasAtTop(true);
-    } else if (wasAtTop && latest > 300) {
-      // L'utilisateur était au top et a commencé à défiler vers le bas
-      // On réinitialise l'animation pour qu'elle puisse se rejouer
-      setShouldResetAnimation(true);
-      setWasAtTop(false);
-    }
+    // Utiliser requestAnimationFrame pour s'assurer que les mises à jour d'état sont synchronisées avec les rendus
+    requestAnimationFrame(() => {
+      if (latest < 100) {
+        setWasAtTop(true);
+      } else if (wasAtTop && latest > 300) {
+        // L'utilisateur était au top et a commencé à défiler vers le bas
+        // On réinitialise l'animation pour qu'elle puisse se rejouer
+        setShouldResetAnimation(true);
+        setWasAtTop(false);
+      }
+    });
   });
 
   // Déterminer la position initiale en fonction de la direction

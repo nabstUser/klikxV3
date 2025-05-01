@@ -31,16 +31,19 @@ const TextReveal: React.FC<TextRevealProps> = ({
   const { scrollY } = useScroll();
 
   // Surveiller la position de défilement et détecter quand l'utilisateur remonte en haut
+  // Optimisation: Utiliser requestAnimationFrame pour réduire l'impact des mises à jour d'état
   useMotionValueEvent(scrollY, "change", (latest) => {
     // Si l'utilisateur est proche du haut de la page
-    if (latest < 100) {
-      setWasAtTop(true);
-    } else if (wasAtTop && latest > 300) {
-      // L'utilisateur était au top et a commencé à défiler vers le bas
-      // On réinitialise l'animation pour qu'elle puisse se rejouer
-      setShouldResetAnimation(true);
-      setWasAtTop(false);
-    }
+    requestAnimationFrame(() => {
+      if (latest < 100) {
+        setWasAtTop(true);
+      } else if (wasAtTop && latest > 300) {
+        // L'utilisateur était au top et a commencé à défiler vers le bas
+        // On réinitialise l'animation pour qu'elle puisse se rejouer
+        setShouldResetAnimation(true);
+        setWasAtTop(false);
+      }
+    });
   });
 
   // Préparer les lignes de texte

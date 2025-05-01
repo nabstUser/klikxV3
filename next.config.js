@@ -3,7 +3,7 @@ const nextConfig = {
   output: 'export',
   distDir: 'out',
   images: {
-    unoptimized: true,
+    unoptimized: true, // Nécessaire avec { output: 'export' }
     domains: [
       "source.unsplash.com",
       "images.unsplash.com",
@@ -31,7 +31,7 @@ const nextConfig = {
         hostname: "ugc.same-assets.com",
         pathname: "/**",
       },
-    ],
+    ]
   },
   typescript: {
     ignoreBuildErrors: true,

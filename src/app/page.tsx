@@ -288,7 +288,11 @@ export default function Home() {
                   }}
                 ></div>
                 {/* iPhone animé au premier plan */}
-                <AnimatedIPhone className="w-full h-auto relative z-10" />
+                <AnimatedIPhone
+                  className="w-full h-auto relative z-10"
+                  initialDelay={800}
+                  loadingComplete={!loading}
+                />
               </div>
             </div>
           </div>
