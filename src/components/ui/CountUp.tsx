@@ -15,7 +15,7 @@ interface CountUpProps {
 
 const CountUp: React.FC<CountUpProps> = ({
   end,
-  duration = 2000,
+  duration = 1200, // Réduit davantage pour une animation plus rapide
   prefix = '',
   suffix = '',
   decimals = 0,
@@ -23,77 +23,49 @@ const CountUp: React.FC<CountUpProps> = ({
   delay = 0
 }) => {
   const [count, setCount] = useState(0);
-  const [shouldReset, setShouldReset] = useState(false);
-  const [hasTriggeredOnce, setHasTriggeredOnce] = useState(false);
-  const [wasAtTop, setWasAtTop] = useState(true);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false });
-
-  // Effet pour gérer la position de défilement
-  useEffect(() => {
-    const handleScroll = () => {
-      // Si l'utilisateur est proche du haut de la page
-      if (window.scrollY < 100) {
-        setWasAtTop(true);
-      } else if (wasAtTop && window.scrollY > 300) {
-        // L'utilisateur était au top et a commencé à défiler vers le bas
-        setShouldReset(true);
-        setWasAtTop(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [wasAtTop]);
+  const isInView = useInView(ref, { once: true });
 
   // Effet pour démarrer l'animation quand l'élément est visible
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || hasAnimated) return;
 
-    if (!hasTriggeredOnce) {
-      setHasTriggeredOnce(true);
-    } else if (shouldReset) {
-      // Réinitialiser le compteur pour recommencer l'animation
-      setCount(0);
-      setShouldReset(false);
-    }
+    setHasAnimated(true);
 
-    let startTime: number | null = null;
-    let animationFrame: number;
+    // Approche plus simple et plus directe pour l'animation
+    const startValue = 0;
+    const steps = 30; // Nombre d'étapes pour l'animation
+    const stepDuration = duration / steps;
+    let currentStep = 0;
 
-    // Début de l'animation après le délai spécifié
     const timer = setTimeout(() => {
-      const animate = (timestamp: number) => {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / duration, 1);
+      const interval = setInterval(() => {
+        currentStep += 1;
 
-        // Fonction d'easing améliorée pour une décélération plus douce
-        // Combinaison de cubic et exponential pour une fin plus graduelle
-        const easeOutCubicExp = progress === 1
-          ? 1
-          : 1 - Math.pow(1 - progress, 5) + (Math.sin(progress * Math.PI) * (1 - progress) * 0.2);
+        if (currentStep <= steps) {
+          // Calcul linéaire avec légère accélération pour éviter de dépasser
+          const progress = currentStep / steps;
+          // Fonction d'easing simple qui s'assure de ne jamais dépasser 1
+          const easing = Math.min(progress * 1.2, 1);
+          // Calculer la valeur actuelle arrondie à l'entier inférieur
+          const newValue = Math.floor(startValue + (end - startValue) * easing);
+          // S'assurer que la valeur ne dépasse jamais la valeur finale
+          const safeValue = Math.min(newValue, end);
 
-        // Calcul de la valeur actuelle en fonction de la progression
-        const currentValue = Math.floor(easeOutCubicExp * end);
-        setCount(currentValue);
-
-        if (progress < 1) {
-          animationFrame = requestAnimationFrame(animate);
+          setCount(safeValue);
         } else {
-          // Assurons-nous d'arriver exactement à la valeur finale
+          // Étape finale - s'assurer d'être exactement à la valeur cible
           setCount(end);
+          clearInterval(interval);
         }
-      };
+      }, stepDuration);
 
-      animationFrame = requestAnimationFrame(animate);
-
-      return () => {
-        cancelAnimationFrame(animationFrame);
-      };
+      return () => clearInterval(interval);
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [isInView, end, duration, delay, hasTriggeredOnce, shouldReset]);
+  }, [isInView, end, duration, delay, hasAnimated]);
 
   // Formatage du nombre avec des décimales et séparateurs
   const formattedNumber = () => {

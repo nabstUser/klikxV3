@@ -315,7 +315,7 @@ export default function Home() {
       {/* Services Section */}
       <section
         id="services"
-        className="min-h-screen flex flex-col text-white text-lg relative"
+        className="min-h-screen flex flex-col text-white text-lg relative pb-8"
         style={{
           backgroundImage: `url(${getBackgroundImageForPlan()})`,
           backgroundSize: "cover",
@@ -324,26 +324,26 @@ export default function Home() {
           transition: "background-image 0.5s ease-in-out",
         }}
       >
-        <div className="container mx-auto px-4 flex-1 flex flex-col justify-between relative z-10 py-16">
+        <div className="container mx-auto px-4 flex-1 flex flex-col justify-between relative z-10 py-12 md:py-16">
           {/* Titre en haut */}
-          <div className="grid grid-cols-12 gap-x-16">
+          <div className="grid grid-cols-12 gap-4 md:gap-x-16 mb-8 md:mb-0">
             <div className="col-span-12 lg:col-span-5">
               <TextReveal
                 text={["NOS", "SERVICES"]}
-                className="text-8xl font-bold leading-none"
+                className="text-6xl md:text-7xl lg:text-8xl font-bold leading-none"
                 delay={0.2}
               />
             </div>
           </div>
 
           {/* Contenu en bas - le bloc que vous souhaitez aligner en bas */}
-          <div className="grid grid-cols-12 gap-x-16 mt-auto">
+          <div className="grid grid-cols-12 gap-4 md:gap-x-16 mt-8 lg:mt-auto">
             <div className="col-span-5 lg:block hidden">
               {/* Colonne vide pour maintenir l'alignement avec le titre */}
             </div>
             <div className="col-span-12 lg:col-span-7 mt-auto">
               <ScrollReveal delay={0.3} direction="up">
-                <p className="text-lg mb-8 w-full">
+                <p className="text-base md:text-lg mb-6 md:mb-8 w-full">
                   Le forfait dépend de la taille de votre appartement et du niveau de détail souhaité. Après réception de vos plans ou photos, nous vous guidons vers l'option la plus adaptée.
                 </p>
               </ScrollReveal>
