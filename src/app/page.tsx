@@ -12,6 +12,7 @@ import { FoundationArrow } from "@/components/ui/FoundationArrow";
 import { AnimatedIPhone } from "@/components/ui/AnimatedIPhone";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import TextReveal from "@/components/ui/TextReveal";
+import CountUp from "@/components/ui/CountUp";
 
 export default function Home() {
   const [activePlan, setActivePlan] = useState('premium');
@@ -211,15 +212,17 @@ export default function Home() {
                   </div>
                 </div>
                 <div>
-                  <a
-                    href="#services"
-                    className="bg-gray-200 text-gray-800 inline-flex items-center py-3 px-6 cursor-pointer rounded-md group"
-                  >
-                    <span className="font-medium">Devis</span>
-                    <div className="ml-2">
-                      <FoundationArrow darkMode={true} size="small" />
-                    </div>
-                  </a>
+                  <ScrollReveal delay={0.5}>
+                    <a
+                      href="#services"
+                      className="bg-gray-200 text-gray-800 inline-flex items-center py-3 px-6 cursor-pointer rounded-md group"
+                    >
+                      <span className="font-medium">Devis</span>
+                      <div className="ml-2">
+                        <FoundationArrow darkMode={true} size="small" />
+                      </div>
+                    </a>
+                  </ScrollReveal>
                 </div>
               </div>
             </div>
@@ -243,7 +246,9 @@ export default function Home() {
             <div className="md:row-span-3 md:col-start-1 md:row-start-1">
               <ScrollReveal className="h-full">
                 <div className="bg-[#7790ED] rounded-md h-full flex flex-col justify-between p-8">
-                  <p className="text-[7rem] leading-none font-bold text-white">+35%</p>
+                  <p className="text-[7rem] leading-none font-bold text-white">
+                    <CountUp end={35} prefix="+" suffix="%" duration={2500} />
+                  </p>
                   <div>
                     <div className="w-full h-[1px] bg-white opacity-30 mb-2"></div>
                     <p className="text-sm text-white opacity-90">Augmentation des réservations</p>
@@ -254,7 +259,9 @@ export default function Home() {
             <div className="md:row-span-3 md:col-start-1 md:row-start-4">
               <ScrollReveal className="h-full" delay={0.2}>
                 <div className="bg-[#212121] rounded-md h-full flex flex-col justify-between p-8">
-                  <p className="text-[7rem] leading-none font-bold text-white">60+</p>
+                  <p className="text-[7rem] leading-none font-bold text-white">
+                    <CountUp end={60} suffix="+" duration={2700} />
+                  </p>
                   <div>
                     <div className="w-full h-[1px] bg-white opacity-30 mb-2"></div>
                     <p className="text-sm text-white opacity-90">Propriétés valorisées</p>
@@ -265,7 +272,9 @@ export default function Home() {
             <div className="md:row-span-3 md:col-start-2 md:row-start-2">
               <ScrollReveal className="h-full" delay={0.3}>
                 <div className="bg-[#292621] rounded-md h-full flex flex-col justify-between p-8">
-                  <p className="text-[7rem] leading-none font-bold text-white">98%</p>
+                  <p className="text-[7rem] leading-none font-bold text-white">
+                    <CountUp end={98} suffix="%" duration={2900} />
+                  </p>
                   <div>
                     <div className="w-full h-[1px] bg-white opacity-30 mb-2"></div>
                     <p className="text-sm text-white opacity-90">Taux de satisfaction client</p>
@@ -276,7 +285,9 @@ export default function Home() {
             <div className="md:row-span-3 md:col-start-2 md:row-start-5">
               <ScrollReveal className="h-full" delay={0.4}>
                 <div className="bg-[#ADADAD] rounded-md h-full flex flex-col justify-between p-8">
-                  <p className="text-[7rem] leading-none font-bold text-white">45+</p>
+                  <p className="text-[7rem] leading-none font-bold text-white">
+                    <CountUp end={45} suffix="+" duration={2800} />
+                  </p>
                   <div>
                     <div className="w-full h-[1px] bg-white opacity-30 mb-2"></div>
                     <p className="text-sm text-white opacity-90">Modèles 3D réalisés</p>
@@ -287,7 +298,9 @@ export default function Home() {
             <div className="md:row-span-3 md:col-start-3 md:row-start-3">
               <ScrollReveal className="h-full" delay={0.5}>
                 <div className="bg-[#F5EDE2] rounded-md h-full flex flex-col justify-between p-8">
-                  <p className="text-[7rem] leading-none font-bold text-[#212121]">72H</p>
+                  <p className="text-[7rem] leading-none font-bold text-[#212121]">
+                    <CountUp end={72} suffix="H" duration={2200} />
+                  </p>
                   <div className="mt-auto">
                     <div className="w-full h-[1px] bg-[#212121] opacity-20 mb-2"></div>
                     <p className="text-sm text-[#212121] opacity-70">Délai moyen de livraison</p>
@@ -302,7 +315,7 @@ export default function Home() {
       {/* Services Section */}
       <section
         id="services"
-        className="h-screen flex flex-col text-white text-lg relative"
+        className="min-h-screen flex flex-col text-white text-lg relative"
         style={{
           backgroundImage: `url(${getBackgroundImageForPlan()})`,
           backgroundSize: "cover",
@@ -311,28 +324,32 @@ export default function Home() {
           transition: "background-image 0.5s ease-in-out",
         }}
       >
-        <div className="container mx-auto px-4 flex-1 flex flex-col relative z-10">
-          <div className="grid grid-cols-12 gap-x-16 h-full">
-            <div className="col-span-12 lg:col-span-5 flex flex-col h-full">
-              <div className="pt-16">
-                <TextReveal
-                  text={["NOS", "SERVICES"]}
-                  className="text-8xl font-bold leading-none"
-                  delay={0.2}
-                />
-              </div>
+        <div className="container mx-auto px-4 flex-1 flex flex-col justify-between relative z-10 py-16">
+          {/* Titre en haut */}
+          <div className="grid grid-cols-12 gap-x-16">
+            <div className="col-span-12 lg:col-span-5">
+              <TextReveal
+                text={["NOS", "SERVICES"]}
+                className="text-8xl font-bold leading-none"
+                delay={0.2}
+              />
             </div>
-            <div className="col-span-12 lg:col-span-7 flex flex-col h-full">
-              <div className="mt-auto pb-16 w-full">
-                <ScrollReveal delay={0.3} direction="up">
-                  <p className="text-lg mb-8 w-full">
-                    Le forfait dépend de la taille de votre appartement et du niveau de détail souhaité. Après réception de vos plans ou photos, nous vous guidons vers l'option la plus adaptée.
-                  </p>
-                </ScrollReveal>
-                <ScrollReveal delay={0.4} direction="up">
-                  <PricingTabs onPlanChange={handlePlanChange} />
-                </ScrollReveal>
-              </div>
+          </div>
+
+          {/* Contenu en bas - le bloc que vous souhaitez aligner en bas */}
+          <div className="grid grid-cols-12 gap-x-16 mt-auto">
+            <div className="col-span-5 lg:block hidden">
+              {/* Colonne vide pour maintenir l'alignement avec le titre */}
+            </div>
+            <div className="col-span-12 lg:col-span-7 mt-auto">
+              <ScrollReveal delay={0.3} direction="up">
+                <p className="text-lg mb-8 w-full">
+                  Le forfait dépend de la taille de votre appartement et du niveau de détail souhaité. Après réception de vos plans ou photos, nous vous guidons vers l'option la plus adaptée.
+                </p>
+              </ScrollReveal>
+              <ScrollReveal delay={0.4} direction="up">
+                <PricingTabs onPlanChange={handlePlanChange} />
+              </ScrollReveal>
             </div>
           </div>
         </div>

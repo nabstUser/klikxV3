@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useRef, ReactNode } from "react";
-import { motion, useInView } from "framer-motion";
+import type React from "react";
+import { useRef, useEffect, useState, type ReactNode } from "react"
+import { motion, useInView, useScroll, useMotionValueEvent } from "framer-motion";
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -23,11 +24,32 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
   direction = "up",
   className = "",
   duration = 0.5,
-  once = true,
+  once = false, // Changé à false par défaut pour permettre la réinitialisation
   margin = "-100px 0px -100px 0px"
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once, margin });
+  const [shouldResetAnimation, setShouldResetAnimation] = useState(false);
+  const [hasTriggeredOnce, setHasTriggeredOnce] = useState(false);
+  const [wasAtTop, setWasAtTop] = useState(true);
+
+  // Utiliser useInView avec once=false pour permettre de rejouer l'animation
+  const isInView = useInView(ref, { once: false, margin });
+
+  // Suivre le défilement de la page
+  const { scrollY } = useScroll();
+
+  // Surveiller la position de défilement et détecter quand l'utilisateur remonte en haut
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    // Si l'utilisateur est proche du haut de la page
+    if (latest < 100) {
+      setWasAtTop(true);
+    } else if (wasAtTop && latest > 300) {
+      // L'utilisateur était au top et a commencé à défiler vers le bas
+      // On réinitialise l'animation pour qu'elle puisse se rejouer
+      setShouldResetAnimation(true);
+      setWasAtTop(false);
+    }
+  });
 
   // Déterminer la position initiale en fonction de la direction
   const getInitialPosition = () => {
@@ -59,11 +81,26 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
     }
   };
 
+  // Surveiller quand l'élément entre dans la vue
+  useEffect(() => {
+    if (isInView && !hasTriggeredOnce) {
+      setHasTriggeredOnce(true);
+    } else if (isInView && shouldResetAnimation) {
+      // Réinitialiser le flag d'animation quand l'élément redevient visible
+      setShouldResetAnimation(false);
+    }
+  }, [isInView, hasTriggeredOnce, shouldResetAnimation]);
+
+  // Déterminer l'état d'animation actuel
+  const currentAnimation = isInView && !shouldResetAnimation
+    ? getAnimatePosition()
+    : getInitialPosition();
+
   return (
     <motion.div
       ref={ref}
       initial={getInitialPosition()}
-      animate={isInView ? getAnimatePosition() : getInitialPosition()}
+      animate={currentAnimation}
       transition={{
         duration,
         delay,
