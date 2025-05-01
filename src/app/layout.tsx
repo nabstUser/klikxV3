@@ -1,10 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Kumbh_Sans } from "next/font/google";
 import "./globals.css";
+import "./fonts.css";  // Importer les définitions de polices spécifiques pour le SVG
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+// Chargement complet de la police Kumbh Sans avec tous les poids disponibles
+const kumbhSans = Kumbh_Sans({
+  variable: "--font-kumbh-sans",
+  subsets: ["latin"],
+  display: "swap",  // Utilisation de 'swap' pour un rendu plus rapide
+  preload: true,    // Précharger la police
+  weight: ["400", "500", "600"],  // Regular, Medium, SemiBold
 });
 
 export const viewport: Viewport = {
@@ -147,7 +157,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable}`}>
+    <html lang="fr" className={`${inter.variable} ${kumbhSans.variable}`}>
       <head>
         <script
           type="application/ld+json"
@@ -158,6 +168,11 @@ export default function RootLayout({
         <meta name="geo.placename" content="Lausanne" />
         <meta name="geo.position" content="46.5196;6.6323" />
         <meta name="ICBM" content="46.5196, 6.6323" />
+        {/* Chargement direct des polices Google Fonts pour le SVG */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
         <GoogleAnalytics />
       </head>
       <body suppressHydrationWarning className="antialiased">

@@ -389,12 +389,12 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({
               font-size: 13px;
             }
 
-            .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-8, .cls-9, .cls-10 {
-              fill: #fff;
-            }
-
             .cls-2, .cls-6, .cls-11, .cls-10 {
               font-family: KumbhSans-Regular, 'Kumbh Sans', system-ui, sans-serif;
+            }
+
+            .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-8, .cls-9, .cls-10 {
+              fill: #fff;
             }
 
             .cls-12 {
