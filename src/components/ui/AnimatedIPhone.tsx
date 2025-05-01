@@ -40,6 +40,13 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
   // car la méthode getTotalLength() pourrait ne pas être disponible immédiatement
   const graphPathLength = 1000; // Une valeur approximative qui fonctionne bien pour ce graphique
 
+  const [debugState, setDebugState] = useState('');
+
+  // Debug utilisation
+  useEffect(() => {
+    console.log(`graphProgress changed: ${graphProgress.toFixed(2)}`);
+  }, [graphProgress]);
+
   // Format number with apostrophe as thousand separator
   const formatNumber = (num: number): string => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
@@ -48,9 +55,9 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
   // Animation effect in sequence: title -> stats -> bottomText
   useEffect(() => {
     // Animer les différentes parties dans l'ordre
-    const titleDelay = 500; // Délai avant d'afficher le titre
-    const statsDelay = 500; // Délai réduit avant d'animer les stats après le titre (était 1000ms)
-    const bottomTextDelay = 1500; // Délai avant d'animer le texte du bas après les stats (était 2000ms)
+    const titleDelay = 300; // Délai avant d'afficher le titre (était 500ms)
+    const statsDelay = 300; // Délai réduit avant d'animer les stats après le titre (était 500ms)
+    const bottomTextDelay = 800; // Délai avant d'animer le texte du bas après les stats (était 1500ms)
 
     // Montrer le titre après un court délai
     setTimeout(() => {
@@ -66,82 +73,187 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
     // Afficher le texte du bas à la fin
     setTimeout(() => {
       setBottomTextVisible(true);
+
+      // Déclencher l'animation des stats du bas
+      setAnimateBottomStats(true);
     }, titleDelay + statsDelay + bottomTextDelay);
   }, []);
 
   // Fonction pour animer les statistiques
   const animateStats = () => {
-    // Target values for main stats
+    console.log("Animation démarrée avec graphProgress = 0");
+
+    // Forcer une réinitialisation complète
+    setGraphProgress(0);
+
+    console.log("Après setGraphProgress(0), valeur =", graphProgress);
+
+    // Démarrer l'animation après un délai très court
+    setTimeout(() => {
+      console.log("Démarrage de l'animation après délai");
+
+      // Target values for main stats
+      const targetMainAmount = 93958;
+      const targetPreviousAmount = 67860;
+      const targetPreviousPercentage = 3;
+      const targetCurrentAmount = 93958;
+      const targetCurrentPercentage = 37;
+
+      // Target values for bottom stats
+      const targetPrixMoyen = 290;
+      const targetTauxOccupation = 87;
+      const targetAvisClient = 4.8;
+      const targetRevenus = 6850;
+
+      const duration = 1200; // Animation plus rapide (était 2000ms)
+      const framesPerSecond = 60;
+      const totalFrames = duration / 1000 * framesPerSecond;
+      let frame = 0;
+
+      const animate = () => {
+        frame++;
+        const progress = Math.min(frame / totalFrames, 1);
+        const easeProgress = 1 - (1 - progress) ** 3; // Cubic ease-out
+
+        // Animate main stats
+        setMainAmount(Math.round(targetMainAmount * easeProgress));
+        setPreviousAmount(Math.round(targetPreviousAmount * easeProgress));
+        setPreviousPercentage(Math.round(targetPreviousPercentage * easeProgress));
+        setCurrentAmount(Math.round(targetCurrentAmount * easeProgress));
+        setCurrentPercentage(Math.round(targetCurrentPercentage * easeProgress));
+
+        // Animate graph progress - IMPORTANT: c'est ce qui fait bouger la ligne!
+        setGraphProgress(easeProgress);
+
+        console.log(`Frame ${frame}/${totalFrames}, progress: ${easeProgress.toFixed(2)}`);
+
+        if (frame < totalFrames) {
+          requestAnimationFrame(animate);
+        } else {
+          // Main animation is complete
+          setIsAnimationComplete(true);
+          console.log("Animation terminée!");
+
+          // Add a slight delay before showing the glow effect
+          setTimeout(() => {
+            setShowGlow(true);
+            setAnimateBottomStats(true);
+
+            // Mettre en place la boucle d'animation
+            scheduleGraphReanimation();
+          }, 500);
+        }
+      };
+
+      // Start stats animation
+      animate();
+    }, 50);
+  };
+
+  // Fonction pour programmer la réanimation du graphique
+  const scheduleGraphReanimation = () => {
+    // Attendre entre 10 et 15 secondes avant de relancer l'animation
+    const delay = Math.random() * 5000 + 10000; // Entre 10000ms et 15000ms
+    console.log(`Prochaine animation dans ${Math.round(delay/1000)} secondes`);
+
+    setDebugState(`Prochaine animation dans ${Math.round(delay/1000)}s`);
+
+    setTimeout(() => {
+      // Séquence de disparition dans l'ordre inverse
+      fadeOutAndReanimate();
+    }, delay);
+  };
+
+  // Nouvelle fonction pour faire disparaître les éléments dans l'ordre inverse
+  const fadeOutAndReanimate = () => {
+    // D'abord faire disparaître le texte du bas
+    setBottomTextVisible(false);
+    // Désactiver l'animation des stats du bas pour pouvoir la relancer plus tard
+    setAnimateBottomStats(false);
+
+    // Puis faire disparaître les stats après un délai
+    setTimeout(() => {
+      setStatsVisible(false);
+
+      // Enfin faire disparaître le titre et réinitialiser tout
+      setTimeout(() => {
+        setTitleVisible(false);
+
+        // Après la disparition complète, réinitialiser et redémarrer l'animation
+        setTimeout(() => {
+          // Réinitialiser tous les états
+          setGraphProgress(0);
+          setMainAmount(0);
+          setPreviousAmount(0);
+          setPreviousPercentage(0);
+          setCurrentAmount(0);
+          setCurrentPercentage(0);
+
+          // Réinitialiser explicitement les stats du bas
+          setPrixMoyen(0);
+          setTauxOccupation(0);
+          setAvisClient(0);
+          setRevenus(0);
+
+          // Relancer toute la séquence d'animation
+          // Même timing que dans le useEffect initial
+          const titleDelay = 300;
+          const statsDelay = 300;
+          const bottomTextDelay = 800;
+
+          // Montrer le titre après un court délai
+          setTimeout(() => {
+            setTitleVisible(true);
+          }, titleDelay);
+
+          // Lancer l'animation des stats après le titre
+          setTimeout(() => {
+            setStatsVisible(true);
+            animateStats();
+          }, titleDelay + statsDelay);
+
+          // Afficher le texte du bas à la fin
+          setTimeout(() => {
+            setBottomTextVisible(true);
+
+            // IMPORTANT: Réactiver l'animation des stats du bas
+            setAnimateBottomStats(true);
+          }, titleDelay + statsDelay + bottomTextDelay);
+
+        }, 500); // Attendre que tout soit invisible
+      }, 300);
+    }, 300);
+  };
+
+  // Fonction pour réanimer le graphique
+  const reanimateGraph = () => {
+    // Note: Cette fonction n'est plus utilisée directement, tout passe par fadeOutAndReanimate
+    // Elle reste au cas où on voudrait l'utiliser à nouveau
+
+    // Réinitialiser le graphique
+    setGraphProgress(0);
+
+    // Animer à nouveau les statistiques principales lors de la réanimation
+    setMainAmount(0);
+    setPreviousAmount(0);
+    setPreviousPercentage(0);
+    setCurrentAmount(0);
+    setCurrentPercentage(0);
+
+    // Réinitialiser aussi les stats du bas
+    setPrixMoyen(0);
+    setTauxOccupation(0);
+    setAvisClient(0);
+    setRevenus(0);
+
+    // Animation complète des valeurs
     const targetMainAmount = 93958;
     const targetPreviousAmount = 67860;
     const targetPreviousPercentage = 3;
     const targetCurrentAmount = 93958;
     const targetCurrentPercentage = 37;
 
-    // Target values for bottom stats
-    const targetPrixMoyen = 290;
-    const targetTauxOccupation = 87;
-    const targetAvisClient = 4.8;
-    const targetRevenus = 6850;
-
-    const duration = 2000; // 2 seconds for the animation
-    const framesPerSecond = 60;
-    const totalFrames = duration / 1000 * framesPerSecond;
-    let frame = 0;
-
-    const animate = () => {
-      frame++;
-      const progress = Math.min(frame / totalFrames, 1);
-      const easeProgress = 1 - (1 - progress) ** 3; // Cubic ease-out
-
-      // Animate main stats
-      setMainAmount(Math.round(targetMainAmount * easeProgress));
-      setPreviousAmount(Math.round(targetPreviousAmount * easeProgress));
-      setPreviousPercentage(Math.round(targetPreviousPercentage * easeProgress));
-      setCurrentAmount(Math.round(targetCurrentAmount * easeProgress));
-      setCurrentPercentage(Math.round(targetCurrentPercentage * easeProgress));
-
-      // Animate graph progress
-      setGraphProgress(easeProgress);
-
-      if (frame < totalFrames) {
-        requestAnimationFrame(animate);
-      } else {
-        // Main animation is complete
-        setIsAnimationComplete(true);
-
-        // Add a slight delay before showing the glow effect
-        setTimeout(() => {
-          setShowGlow(true);
-          setAnimateBottomStats(true);
-
-          // Mettre en place la boucle d'animation
-          scheduleGraphReanimation();
-        }, 500);
-      }
-    };
-
-    // Start stats animation
-    animate();
-  };
-
-  // Fonction pour programmer la réanimation du graphique
-  const scheduleGraphReanimation = () => {
-    // Attendre entre 8 et 12 secondes avant de relancer l'animation
-    const delay = Math.random() * 4000 + 8000; // Entre 8000ms et 12000ms
-
-    setTimeout(() => {
-      reanimateGraph();
-    }, delay);
-  };
-
-  // Fonction pour réanimer le graphique
-  const reanimateGraph = () => {
-    // Réinitialiser le graphique
-    setGraphProgress(0);
-
-    // Relancer l'animation du graphique
-    const duration = 2000; // 2 secondes pour l'animation
+    const duration = 1000; // Animation plus rapide (était 2000ms)
     const framesPerSecond = 60;
     const totalFrames = duration / 1000 * framesPerSecond;
     let frame = 0;
@@ -151,8 +263,13 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
       const progress = Math.min(frame / totalFrames, 1);
       const easeProgress = 1 - (1 - progress) ** 3; // Cubic ease-out
 
-      // Animer seulement le graphique et la ligne verticale
+      // Animer à la fois le graphique ET les statistiques
       setGraphProgress(easeProgress);
+      setMainAmount(Math.round(targetMainAmount * easeProgress));
+      setPreviousAmount(Math.round(targetPreviousAmount * easeProgress));
+      setPreviousPercentage(Math.round(targetPreviousPercentage * easeProgress));
+      setCurrentAmount(Math.round(targetCurrentAmount * easeProgress));
+      setCurrentPercentage(Math.round(targetCurrentPercentage * easeProgress));
 
       if (frame < totalFrames) {
         requestAnimationFrame(animateGraph);
@@ -179,7 +296,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
     const targetAvisClient = 4.8;
     const targetRevenus = 6850;
 
-    const duration = 1500; // Slightly faster than main animation
+    const duration = 800; // Animation plus rapide (était 1500ms)
     const framesPerSecond = 60;
     const totalFrames = duration / 1000 * framesPerSecond;
     let frame = 0;
@@ -209,6 +326,9 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
 
       if (frame < totalFrames) {
         requestAnimationFrame(animateBottomText);
+      } else {
+        // Animation terminée - mais on maintient la valeur à true pour que les stats restent visibles
+        // Nous ne désactivons pas animateBottomStats ici
       }
     };
 
@@ -218,6 +338,25 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
 
     return () => clearTimeout(timer);
   }, [animateBottomStats]);
+
+  // Nouvelle boucle d'animation qui se déclenche périodiquement, même sans interaction utilisateur
+  useEffect(() => {
+    // Démarrer la boucle automatique seulement une fois l'animation principale terminée
+    if (!isAnimationComplete) return;
+
+    // Créer un intervalle qui anime périodiquement le graphique
+    const autoLoopInterval = setInterval(() => {
+      // Relancer l'animation si elle n'est pas déjà en cours de réinitialisation
+      // (quand tous les éléments sont visibles et l'animation est complète)
+      if (graphProgress >= 0.99 && titleVisible && statsVisible && bottomTextVisible) {
+        // Désactiver cette fonctionnalité car on utilise scheduleGraphReanimation
+        // fadeOutAndReanimate();
+        console.log("Auto-loop désactivé, utilisant scheduleGraphReanimation à la place");
+      }
+    }, 30000); // Vérifier toutes les 30 secondes (augmenté de 10s à 30s)
+
+    return () => clearInterval(autoLoopInterval);
+  }, [isAnimationComplete, graphProgress, titleVisible, statsVisible, bottomTextVisible]);
 
   return (
     <div className="relative">
@@ -407,38 +546,49 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
             }
 
             .stat-number {
-              transition: all 0.3s ease;
+              transition: all 0.2s ease;
             }
 
             @keyframes pulse {
-              0% { opacity: 0.8; }
+              0% { opacity: 0.9; }
               50% { opacity: 1; }
-              100% { opacity: 0.8; }
+              100% { opacity: 0.9; }
             }
 
             @keyframes pulse-arrow {
               0% { transform: translateY(0) scale(1); }
-              50% { transform: translateY(-2px) scale(1.05); }
+              50% { transform: translateY(-3px) scale(1.08); }
               100% { transform: translateY(0) scale(1); }
             }
 
             @keyframes pulse-glow {
               0% { opacity: 0.3; transform: scale(1.1); }
-              100% { opacity: 0.7; transform: scale(1.15); }
+              100% { opacity: 0.8; transform: scale(1.18); }
             }
 
-            .number-animation-complete {
-              animation: pulse 2s infinite;
-            }
+            /* Suppression de la classe number-animation-complete pour éviter le clignotement */
+            /* .number-animation-complete {
+              animation: pulse 1.5s infinite;
+            } */
 
             .arrow-animation {
-              animation: pulse-arrow 2s infinite ease-in-out;
+              animation: pulse-arrow 1.2s infinite ease-in-out;
               transform-origin: center;
               transform-box: fill-box;
             }
 
             .circle-animation {
-              animation: pulse 3s infinite alternate;
+              animation: pulse 2s infinite alternate;
+            }
+
+            /* Ajout d'une transition douce pour la réinitialisation des stats */
+            .stat-number {
+              transition: color 0.2s, opacity 0.3s;
+            }
+            .stat-number.reinit {
+              opacity: 0.3;
+              color: #bfc8e6;
+              transition: color 0.2s, opacity 0.3s;
             }
             `}
           </style>
@@ -468,16 +618,39 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
 
         <g id="stats" style={{ opacity: statsVisible ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}>
           <rect id="statsBgc" className="cls-24" x="9.72" y="133.5" width="297.11" height="219.45" rx="3.55" ry="3.55"/>
-          <path
-            id="statsGraph"
-            className="cls-19"
-            d="M159.07,200.03c.73-1.09,1.78-2.75,2.85-4.9,1.01-2.04,1.3-3.04,1.94-3.08,1.51-.09,2.02,5.47,4.44,5.81,1.2.17,2.34-1.02,3.76-2.51,2.44-2.55,2.22-4.05,3.87-4.78,2.17-.96,4.79.64,5.24.91,2.11,1.29,2.79,3.09,4.33,6.15,2.95,5.89,5.08,10.14,7.06,10.03.35-.02,1.23-.21,3.3-4.78,2.38-5.24,2.51-7.8,4.78-14.01.24-.64.92-2.29,2.28-5.58,3.25-7.85,3.95-9.11,5.01-9.23,2.43-.26,3.94,5.73,5.92,5.35,1.46-.28,1.6-3.71,4.44-11.05,1.31-3.38,1.97-4.43,2.73-4.44,1.88-.02,2.44,6.3,5.13,6.61,1.75.2,2.28-2.39,4.78-2.62,2.51-.23,3.22,2.27,6.04,2.39,2.97.13,3.53-2.58,5.92-2.39,3.53.27,3.49,6.26,8.32,7.97,2.89,1.02,4-.72,7.41.68,3.08,1.27,3.51,3.26,5.24,3.08,2.69-.29,2.83-5.18,5.7-5.81,2.81-.62,4.54,3.67,7.29,3.65,2.16-.02,5.18-2.69,8.77-14.92"
+
+          {/* Graph du haut - version ultra simplifiée, exactement comme la ligne verticale */}
+          <line
+            className="cls-17"
+            x1="158.28"
+            y1="220"
+            x2="158.28"
+            y2={220-30}
             style={{
-              strokeDasharray: graphPathLength,
-              strokeDashoffset: graphPathLength * (1 - graphProgress),
-              transition: "none", // Pour une animation plus fluide, nous utilisons l'état pour contrôler l'animation
+              transition: "none",
+              stroke: "#7790ED",
+              fill: "none",
+              strokeWidth: "2px",
+              strokeMiterlimit: "10"
             }}
           />
+
+          <path
+            d="M159.07,200.03c.73-1.09,1.78-2.75,2.85-4.9,1.01-2.04,1.3-3.04,1.94-3.08,1.51-.09,2.02,5.47,4.44,5.81,1.2.17,2.34-1.02,3.76-2.51,2.44-2.55,2.22-4.05,3.87-4.78,2.17-.96,4.79.64,5.24.91,2.11,1.29,2.79,3.09,4.33,6.15,2.95,5.89,5.08,10.14,7.06,10.03.35-.02,1.23-.21,3.3-4.78,2.38-5.24,2.51-7.8,4.78-14.01.24-.64.92-2.29,2.28-5.58,3.25-7.85,3.95-9.11,5.01-9.23,2.43-.26,3.94,5.73,5.92,5.35,1.46-.28,1.6-3.71,4.44-11.05,1.31-3.38,1.97-4.43,2.73-4.44,1.88-.02,2.44,6.3,5.13,6.61,1.75.2,2.28-2.39,4.78-2.62,2.51-.23,3.22,2.27,6.04,2.39,2.97.13,3.53-2.58,5.92-2.39,3.53.27,3.49,6.26,8.32,7.97,2.89,1.02,4-.72,7.41.68,3.08,1.27,3.51,3.26,5.24,3.08,2.69-.29,2.83-5.18,5.7-5.81,2.81-.62,4.54,3.67,7.29,3.65,2.16-.02,5.18-2.69,8.77-14.92"
+            style={{
+              transition: "none",
+              stroke: "#7790ED",
+              fill: "none",
+              strokeWidth: "2px",
+              strokeMiterlimit: "10",
+              strokeDasharray: "1000",
+              strokeDashoffset: 1000 * (1 - graphProgress)
+            }}
+          />
+
+          {/* Affichage de debug pour voir la valeur de graphProgress */}
+          <text x="40" y="160" fill="white" fontSize="10">progress: {graphProgress.toFixed(2)}</text>
+
           <g id="greenAugment">
             <circle
               className={`cls-21 ${isAnimationComplete ? 'circle-animation' : ''}`}
@@ -511,7 +684,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
             <tspan
               x="0"
               y="0"
-              className={`stat-number ${isAnimationComplete ? 'number-animation-complete' : ''}`}
+              className={`stat-number${mainAmount === 0 && graphProgress === 0 ? ' reinit' : ''}`}
             >
               {`${formatNumber(mainAmount)} €`}
             </tspan>
@@ -522,7 +695,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
           {/* Previous amount - Animated */}
           <text className="cls-7" transform="translate(28.63 280.43)">
             <tspan
-              className={`cls-28 stat-number ${isAnimationComplete ? 'number-animation-complete' : ''}`}
+              className={`cls-28 stat-number${previousAmount === 0 && graphProgress === 0 ? ' reinit' : ''}`}
               x="0"
               y="0"
             >
@@ -535,7 +708,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
             <tspan
               x="0"
               y="0"
-              className={`stat-number ${isAnimationComplete ? 'number-animation-complete' : ''}`}
+              className={`stat-number${previousPercentage === 0 && graphProgress === 0 ? ' reinit' : ''}`}
             >
               {`${previousPercentage} %`}
             </tspan>
@@ -548,7 +721,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
             <tspan
               x="0"
               y="0"
-              className={`stat-number ${isAnimationComplete ? 'number-animation-complete' : ''}`}
+              className={`stat-number${currentAmount === 0 && graphProgress === 0 ? ' reinit' : ''}`}
             >
               {`${formatNumber(currentAmount)} €`}
             </tspan>
@@ -557,7 +730,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
           {/* Current percentage - Animated */}
           <text className="cls-2" transform="translate(210.04 302.74)">
             <tspan
-              className={`cls-28 stat-number ${isAnimationComplete ? 'number-animation-complete' : ''}`}
+              className={`cls-28 stat-number${currentPercentage === 0 && graphProgress === 0 ? ' reinit' : ''}`}
               x="0"
               y="0"
             >
@@ -569,13 +742,19 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
           <line
             className="cls-17"
             x1="158.28"
-            y1="320.45" // Point fixe en bas
+            y1="320.45"
             x2="158.28"
-            y2={320.45 - (320.45 - 248.26) * graphProgress} // Point variable qui monte vers le haut
+            y2={320.45 - (320.45 - 248.26) * graphProgress}
             style={{
-              transition: "none", // Pour une animation fluide en synchronisation avec le graphique
+              transition: "none",
+              stroke: "#fff",
+              fill: "none",
+              strokeMiterlimit: "10"
             }}
           />
+
+          {/* Debug info */}
+          {debugState && <text x="30" y="350" fill="white" fontSize="10">{debugState} - graph:{graphProgress.toFixed(2)}</text>}
         </g>
 
         <g id="bottomTexte" style={{ opacity: bottomTextVisible ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}>
