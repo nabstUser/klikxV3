@@ -17,6 +17,7 @@ import ContactForm from "@/components/ContactForm";
 import ParallaxBackground from "@/components/ui/ParallaxBackground";
 import Image from "next/image";
 import { handleSmoothScroll } from "@/utils/smoothScroll";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Composant pour l'image About avec un effet de parallax simple
 const AboutImage = () => {
@@ -59,6 +60,7 @@ const AboutImage = () => {
 
 export default function Home() {
   const [activePlan, setActivePlan] = useState('premium');
+  const [loading, setLoading] = useState(true);
 
   // Fonction pour initialiser les liens smooth scroll
   useEffect(() => {
@@ -82,6 +84,49 @@ export default function Home() {
 
     // Ajout de l'écouteur d'événement
     document.addEventListener('click', handleLinkClick);
+
+    // Préchargement des images
+    const preloadImages = async () => {
+      try {
+        const imagesToPreload = [
+          '/heroSection.jpg',
+          '/aboutSection.png',
+          '/servicesBasic.png',
+          '/servicesPremium.png',
+          '/servicesDeluxe.png',
+          '/processSection.jpg',
+          '/contactSection.jpg',
+          '/logoKlikx.svg'
+        ];
+
+        const preloadPromises = imagesToPreload.map(src => {
+          return new Promise<void>((resolve, reject) => {
+            const img = new window.Image();
+            img.src = src;
+            img.onload = () => resolve();
+            img.onerror = () => reject();
+          });
+        });
+
+        await Promise.all(preloadPromises);
+        setTimeout(() => {
+          setLoading(false);
+          document.body.style.overflow = '';
+        }, 3000);
+      } catch (error) {
+        console.error('Erreur lors du préchargement des images:', error);
+        setTimeout(() => {
+          setLoading(false);
+          document.body.style.overflow = '';
+        }, 3000);
+      }
+    };
+
+    // Empêcher le défilement pendant le chargement
+    document.body.style.overflow = 'hidden';
+
+    // Lancer le préchargement
+    preloadImages();
 
     // Nettoyage
     return () => {
@@ -110,6 +155,57 @@ export default function Home() {
 
   return (
     <>
+      <AnimatePresence mode="wait">
+        {loading && (
+          <motion.div
+            className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-[#1c1c1c]"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.8 } }}
+          >
+            <div className="w-full max-w-md px-4 relative">
+              {/* Logo et texte Klikx */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="mb-16 flex flex-col items-center"
+              >
+                <img
+                  src="/logoKlikx.svg"
+                  alt="Klikx Logo"
+                  className="h-16 w-auto mb-2"
+                />
+                <div className="text-white text-2xl font-bold">Klikx</div>
+              </motion.div>
+
+              {/* Loading text */}
+              <motion.div
+                className="mb-4 text-white text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+              >
+                <p className="text-lg font-medium tracking-wider">
+                  CHARGEMENT
+                </p>
+              </motion.div>
+
+              {/* Progress bar container */}
+              <div className="w-full h-[2px] bg-white/20">
+                <motion.div
+                  className="h-full bg-[#7790ED]"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 3, ease: "easeInOut" }}
+                />
+              </div>
+
+              {/* Suppression du carré bleu décoratif et du texte sous la barre */}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Header />
 
       {/* Hero Section */}

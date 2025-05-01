@@ -9,15 +9,13 @@ export const smoothScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: strin
   const element = document.getElementById(id);
 
   if (element) {
-    // Calculer la position de défilement avec un offset réduit
-    // Utiliser un offset plus petit pour arriver plus précisément à la section
-    const navOffset = 20; // réduit de 80 à 20
-    const elementPosition = element.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - navOffset;
+    // Calculer la position absolue de l'élément par rapport au document
+    // Sans aucun offset, pour que le haut de la section arrive en haut de la page
+    const elementPosition = element.getBoundingClientRect().top + window.scrollY;
 
     // Défilement fluide
     window.scrollTo({
-      top: offsetPosition,
+      top: elementPosition,
       behavior: "smooth"
     });
   }
@@ -34,12 +32,11 @@ export const handleSmoothScroll = (href: string) => {
     const element = document.getElementById(id);
 
     if (element) {
-      const navOffset = 20; // réduit de 80 à 20
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navOffset;
+      // Sans aucun offset, pour que le haut de la section arrive en haut de la page
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
 
       window.scrollTo({
-        top: offsetPosition,
+        top: elementPosition,
         behavior: "smooth"
       });
 
@@ -51,12 +48,11 @@ export const handleSmoothScroll = (href: string) => {
     const element = document.getElementById(id);
 
     if (element) {
-      const navOffset = 20; // réduit de 80 à 20
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navOffset;
+      // Sans aucun offset, pour que le haut de la section arrive en haut de la page
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
 
       window.scrollTo({
-        top: offsetPosition,
+        top: elementPosition,
         behavior: "smooth"
       });
 

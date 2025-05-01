@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { smoothScrollTo } from "@/utils/smoothScroll";
 
 const Header = () => {
@@ -18,6 +18,8 @@ const Header = () => {
     { href: "/#processus", label: "Processus", id: "processus" },
     { href: "/#contact", label: "Contact", id: "contact" },
   ];
+
+  // Nous supprimons les ajustements de padding pour que les sections arrivent en haut de la page
 
   // Fonction pour suivre la position de la souris dans la navigation
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
