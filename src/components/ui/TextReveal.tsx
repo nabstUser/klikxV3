@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useInView, useScroll, useMotionValueEvent } from "framer-motion";
 
 interface TextRevealProps {
@@ -9,7 +9,7 @@ interface TextRevealProps {
   className?: string;
   delay?: number;
   staggerChildren?: number;
-  once?: boolean;
+  loadingComplete?: boolean;
 }
 
 const TextReveal: React.FC<TextRevealProps> = ({
@@ -17,34 +17,18 @@ const TextReveal: React.FC<TextRevealProps> = ({
   className = "",
   delay = 0,
   staggerChildren = 0.1,
-  once = false, // Changé à false par défaut pour permettre la réinitialisation
+  loadingComplete = true, // Par défaut, considérer le chargement comme terminé
 }) => {
   const ref = useRef(null);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [hasAnimatedOnce, setHasAnimatedOnce] = useState(false);
   const [shouldResetAnimation, setShouldResetAnimation] = useState(false);
-  const [hasTriggeredOnce, setHasTriggeredOnce] = useState(false);
-  const [wasAtTop, setWasAtTop] = useState(true);
 
-  // Utiliser useInView avec once=false pour permettre de rejouer l'animation
+  // Observer quand l'élément est visible
   const isInView = useInView(ref, { once: false, margin: "-100px 0px -100px 0px" });
 
   // Suivre le défilement de la page
   const { scrollY } = useScroll();
-
-  // Surveiller la position de défilement et détecter quand l'utilisateur remonte en haut
-  // Optimisation: Utiliser requestAnimationFrame pour réduire l'impact des mises à jour d'état
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    // Si l'utilisateur est proche du haut de la page
-    requestAnimationFrame(() => {
-      if (latest < 100) {
-        setWasAtTop(true);
-      } else if (wasAtTop && latest > 300) {
-        // L'utilisateur était au top et a commencé à défiler vers le bas
-        // On réinitialise l'animation pour qu'elle puisse se rejouer
-        setShouldResetAnimation(true);
-        setWasAtTop(false);
-      }
-    });
-  });
 
   // Préparer les lignes de texte
   const lines = Array.isArray(text) ? text : text.split("\n");
@@ -73,24 +57,47 @@ const TextReveal: React.FC<TextRevealProps> = ({
     },
   };
 
-  // Surveiller quand l'élément entre dans la vue
+  // Réinitialiser l'animation lorsque l'utilisateur revient en haut de la page
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest < 50) {
+      // Près du haut de la page, réinitialiser les animations pour qu'elles puissent se rejouer
+      if (hasAnimatedOnce) {
+        setShouldResetAnimation(true);
+        setShouldAnimate(false);
+      }
+    }
+  });
+
+  // Gérer le déclenchement de l'animation
   useEffect(() => {
-    if (isInView && !hasTriggeredOnce) {
-      setHasTriggeredOnce(true);
-    } else if (isInView && shouldResetAnimation) {
-      // Réinitialiser le flag d'animation quand l'élément redevient visible
+    // Au chargement initial
+    if (loadingComplete && !hasAnimatedOnce && !shouldAnimate) {
+      // Ajouter un délai pour l'animation initiale
+      const timer = setTimeout(() => {
+        setShouldAnimate(true);
+        setHasAnimatedOnce(true);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+
+    // Lors du défilement (après le chargement initial)
+    if (isInView && hasAnimatedOnce && shouldResetAnimation) {
+      setShouldAnimate(true);
       setShouldResetAnimation(false);
     }
-  }, [isInView, hasTriggeredOnce, shouldResetAnimation]);
 
-  // Déterminer l'état d'animation actuel
-  const animationState = (isInView && !shouldResetAnimation) ? "visible" : "hidden";
+    // Si élément entre dans la vue pour la première fois après chargement
+    if (isInView && !shouldAnimate && hasAnimatedOnce) {
+      setShouldAnimate(true);
+    }
+  }, [loadingComplete, isInView, hasAnimatedOnce, shouldResetAnimation, shouldAnimate]);
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
-      animate={animationState}
+      animate={shouldAnimate ? "visible" : "hidden"}
       variants={containerVariants}
       className={className}
     >

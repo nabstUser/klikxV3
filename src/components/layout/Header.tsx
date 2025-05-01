@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { smoothScrollTo } from "@/utils/smoothScroll";
+import MobileMenu from "./MobileMenu";
 
 const Header = () => {
   const navRef = useRef<HTMLDivElement>(null);
@@ -18,8 +17,6 @@ const Header = () => {
     { href: "/#processus", label: "Processus", id: "processus" },
     { href: "/#contact", label: "Contact", id: "contact" },
   ];
-
-  // Nous supprimons les ajustements de padding pour que les sections arrivent en haut de la page
 
   // Fonction pour suivre la position de la souris dans la navigation
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -86,30 +83,8 @@ const Header = () => {
         </nav>
       </div>
 
-      {/* Menu mobile */}
-      <div className="md:hidden absolute right-4 top-8 pointer-events-auto">
-        <Sheet>
-          <SheetTrigger asChild>
-            <button className="text-white p-2 rounded-xl bg-black/30 backdrop-blur-md">
-              <Menu className="h-5 w-5" />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="right">
-            <nav className="flex flex-col gap-4 mt-8">
-              {menuItems.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  className="text-2xl font-medium"
-                  onClick={(e) => smoothScrollTo(e, item.id)}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
-      </div>
+      {/* Menu mobile personnalisé */}
+      <MobileMenu menuItems={menuItems} />
     </header>
   );
 };

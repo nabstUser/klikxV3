@@ -269,7 +269,8 @@ export default function Home() {
             <TextReveal
               text={["VOS VISUELS,", "VOTRE", "MEILLEUR", "ARGUMENT"]}
               className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tighter text-white mb-8 leading-[1.1]"
-              delay={0.2}
+              delay={0.5}
+              loadingComplete={!loading}
             />
           </div>
 
