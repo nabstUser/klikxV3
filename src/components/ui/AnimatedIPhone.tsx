@@ -40,13 +40,6 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
   // car la méthode getTotalLength() pourrait ne pas être disponible immédiatement
   const graphPathLength = 1000; // Une valeur approximative qui fonctionne bien pour ce graphique
 
-  const [debugState, setDebugState] = useState('');
-
-  // Debug utilisation
-  useEffect(() => {
-    console.log(`graphProgress changed: ${graphProgress.toFixed(2)}`);
-  }, [graphProgress]);
-
   // Format number with apostrophe as thousand separator
   const formatNumber = (num: number): string => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
@@ -57,7 +50,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
     // Animer les différentes parties dans l'ordre
     const titleDelay = 300; // Délai avant d'afficher le titre (était 500ms)
     const statsDelay = 300; // Délai réduit avant d'animer les stats après le titre (était 500ms)
-    const bottomTextDelay = 800; // Délai avant d'animer le texte du bas après les stats (était 1500ms)
+    const bottomTextDelay = 1200; // Délai augmenté avant d'animer le texte du bas après les stats (était 800ms)
 
     // Montrer le titre après un court délai
     setTimeout(() => {
@@ -70,7 +63,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
       animateStats();
     }, titleDelay + statsDelay);
 
-    // Afficher le texte du bas à la fin
+    // Afficher le texte du bas à la fin avec un délai plus long
     setTimeout(() => {
       setBottomTextVisible(true);
 
@@ -81,17 +74,11 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
 
   // Fonction pour animer les statistiques
   const animateStats = () => {
-    console.log("Animation démarrée avec graphProgress = 0");
-
     // Forcer une réinitialisation complète
     setGraphProgress(0);
 
-    console.log("Après setGraphProgress(0), valeur =", graphProgress);
-
     // Démarrer l'animation après un délai très court
     setTimeout(() => {
-      console.log("Démarrage de l'animation après délai");
-
       // Target values for main stats
       const targetMainAmount = 93958;
       const targetPreviousAmount = 67860;
@@ -113,6 +100,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
       const animate = () => {
         frame++;
         const progress = Math.min(frame / totalFrames, 1);
+        // Synchronisation plus naturelle : la ligne bleue va suivre une courbe légèrement différente
         const easeProgress = 1 - (1 - progress) ** 3; // Cubic ease-out
 
         // Animate main stats
@@ -122,22 +110,23 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
         setCurrentAmount(Math.round(targetCurrentAmount * easeProgress));
         setCurrentPercentage(Math.round(targetCurrentPercentage * easeProgress));
 
-        // Animate graph progress - IMPORTANT: c'est ce qui fait bouger la ligne!
-        setGraphProgress(easeProgress);
-
-        console.log(`Frame ${frame}/${totalFrames}, progress: ${easeProgress.toFixed(2)}`);
+        // Animate graph progress - avec une logique spéciale pour la fin
+        setGraphProgress(progress >= 0.95 ? 1 : progress * 0.95); // Force à 1 quand on est près de la fin
 
         if (frame < totalFrames) {
           requestAnimationFrame(animate);
         } else {
+          // Force graphProgress à 1 à la fin pour s'assurer que la ligne est complète
+          setGraphProgress(1);
+
           // Main animation is complete
           setIsAnimationComplete(true);
-          console.log("Animation terminée!");
 
           // Add a slight delay before showing the glow effect
           setTimeout(() => {
             setShowGlow(true);
-            setAnimateBottomStats(true);
+            // Ne pas activer immédiatement les stats du bas - c'est géré par l'useEffect initial avec le délai augmenté
+            // setAnimateBottomStats(true); <- Ligne commentée
 
             // Mettre en place la boucle d'animation
             scheduleGraphReanimation();
@@ -154,9 +143,6 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
   const scheduleGraphReanimation = () => {
     // Attendre entre 10 et 15 secondes avant de relancer l'animation
     const delay = Math.random() * 5000 + 10000; // Entre 10000ms et 15000ms
-    console.log(`Prochaine animation dans ${Math.round(delay/1000)} secondes`);
-
-    setDebugState(`Prochaine animation dans ${Math.round(delay/1000)}s`);
 
     setTimeout(() => {
       // Séquence de disparition dans l'ordre inverse
@@ -199,7 +185,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
           // Même timing que dans le useEffect initial
           const titleDelay = 300;
           const statsDelay = 300;
-          const bottomTextDelay = 800;
+          const bottomTextDelay = 1200; // Délai augmenté ici aussi
 
           // Montrer le titre après un court délai
           setTimeout(() => {
@@ -351,7 +337,6 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
       if (graphProgress >= 0.99 && titleVisible && statsVisible && bottomTextVisible) {
         // Désactiver cette fonctionnalité car on utilise scheduleGraphReanimation
         // fadeOutAndReanimate();
-        console.log("Auto-loop désactivé, utilisant scheduleGraphReanimation à la place");
       }
     }, 30000); // Vérifier toutes les 30 secondes (augmenté de 10s à 30s)
 
@@ -379,6 +364,7 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
         data-name="Calque 2"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 317 648.59"
+        style={{ position: "relative", zIndex: 1 }}
       >
         <defs>
           <style>
@@ -627,7 +613,6 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
             x2="158.28"
             y2={220-30}
             style={{
-              transition: "none",
               stroke: "#7790ED",
               fill: "none",
               strokeWidth: "2px",
@@ -635,21 +620,38 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
             }}
           />
 
-          <path
-            d="M159.07,200.03c.73-1.09,1.78-2.75,2.85-4.9,1.01-2.04,1.3-3.04,1.94-3.08,1.51-.09,2.02,5.47,4.44,5.81,1.2.17,2.34-1.02,3.76-2.51,2.44-2.55,2.22-4.05,3.87-4.78,2.17-.96,4.79.64,5.24.91,2.11,1.29,2.79,3.09,4.33,6.15,2.95,5.89,5.08,10.14,7.06,10.03.35-.02,1.23-.21,3.3-4.78,2.38-5.24,2.51-7.8,4.78-14.01.24-.64.92-2.29,2.28-5.58,3.25-7.85,3.95-9.11,5.01-9.23,2.43-.26,3.94,5.73,5.92,5.35,1.46-.28,1.6-3.71,4.44-11.05,1.31-3.38,1.97-4.43,2.73-4.44,1.88-.02,2.44,6.3,5.13,6.61,1.75.2,2.28-2.39,4.78-2.62,2.51-.23,3.22,2.27,6.04,2.39,2.97.13,3.53-2.58,5.92-2.39,3.53.27,3.49,6.26,8.32,7.97,2.89,1.02,4-.72,7.41.68,3.08,1.27,3.51,3.26,5.24,3.08,2.69-.29,2.83-5.18,5.7-5.81,2.81-.62,4.54,3.67,7.29,3.65,2.16-.02,5.18-2.69,8.77-14.92"
-            style={{
-              transition: "none",
-              stroke: "#7790ED",
-              fill: "none",
-              strokeWidth: "2px",
-              strokeMiterlimit: "10",
-              strokeDasharray: "1000",
-              strokeDashoffset: 1000 * (1 - graphProgress)
-            }}
-          />
+          {/* SOLUTION AMÉLIORÉE POUR LA LIGNE BLEUE
+               - On utilise uniquement un chemin animé avec un clipPath
+               - Pas de tracé gris en fond
+          */}
 
-          {/* Affichage de debug pour voir la valeur de graphProgress */}
-          <text x="40" y="160" fill="white" fontSize="10">progress: {graphProgress.toFixed(2)}</text>
+          {/* Chemin animé qui se dessine progressivement avec clip-path */}
+          <svg width="100%" height="100%" viewBox="0 0 317 648.59" style={{ position: "absolute", top: 0, left: 0, pointerEvents: "none" }}>
+            <defs>
+              <clipPath id="graphClip">
+                {/* Version simplifiée qui couvre tout le SVG quand graphProgress = 1 */}
+                <rect
+                  x="0"
+                  y="0"
+                  width={graphProgress >= 0.99 ? 500 : 317 * graphProgress}
+                  height="648.59"
+                />
+              </clipPath>
+            </defs>
+
+            {/* Le chemin de la ligne bleue */}
+            <path
+              id="statsGraph"
+              d="M159.07,200.03c.73-1.09,1.78-2.75,2.85-4.9,1.01-2.04,1.3-3.04,1.94-3.08,1.51-.09,2.02,5.47,4.44,5.81,1.2.17,2.34-1.02,3.76-2.51,2.44-2.55,2.22-4.05,3.87-4.78,2.17-.96,4.79.64,5.24.91,2.11,1.29,2.79,3.09,4.33,6.15,2.95,5.89,5.08,10.14,7.06,10.03.35-.02,1.23-.21,3.3-4.78,2.38-5.24,2.51-7.8,4.78-14.01.24-.64.92-2.29,2.28-5.58,3.25-7.85,3.95-9.11,5.01-9.23,2.43-.26,3.94,5.73,5.92,5.35,1.46-.28,1.6-3.71,4.44-11.05,1.31-3.38,1.97-4.43,2.73-4.44,1.88-.02,2.44,6.3,5.13,6.61,1.75.2,2.28-2.39,4.78-2.62,2.51-.23,3.22,2.27,6.04,2.39,2.97.13,3.53-2.58,5.92-2.39,3.53.27,3.49,6.26,8.32,7.97,2.89,1.02,4-.72,7.41.68,3.08,1.27,3.51,3.26,5.24,3.08,2.69-.29,2.83-5.18,5.7-5.81,2.81-.62,4.54,3.67,7.29,3.65,2.16-.02,5.18-2.69,8.77-14.92"
+              style={{
+                stroke: "#7790ED",
+                fill: "none",
+                strokeWidth: "2px",
+                strokeMiterlimit: "10"
+              }}
+              clipPath="url(#graphClip)"
+            />
+          </svg>
 
           <g id="greenAugment">
             <circle
@@ -752,9 +754,6 @@ export const AnimatedIPhone: React.FC<AnimatedIPhoneProps> = ({ className }) => 
               strokeMiterlimit: "10"
             }}
           />
-
-          {/* Debug info */}
-          {debugState && <text x="30" y="350" fill="white" fontSize="10">{debugState} - graph:{graphProgress.toFixed(2)}</text>}
         </g>
 
         <g id="bottomTexte" style={{ opacity: bottomTextVisible ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}>
