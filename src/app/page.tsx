@@ -292,6 +292,7 @@ export default function Home() {
                   className="w-full h-auto relative z-10"
                   initialDelay={800}
                   loadingComplete={!loading}
+                  aria-label="Visualisation de statistiques Airbnb montrant l'augmentation des réservations de 37% grâce à Klikx"
                 />
               </div>
             </div>

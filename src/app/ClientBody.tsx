@@ -3,6 +3,24 @@
 import { useEffect } from "react";
 import { handleSmoothScroll } from "@/utils/smoothScroll";
 
+// Ajouter cette fonction pour améliorer le SEO
+export function SeoMetaTags() {
+  return (
+    <>
+      {/* Balises meta supplémentaires pour le SEO */}
+      <meta name="author" content="Klikx" />
+      <meta name="keywords" content="3D, modélisation, Airbnb, conciergerie, rendus 3D, visualisation, intérieur, photographie 3D, Lausanne, Suisse, immobilier" />
+      <meta name="geo.region" content="CH-VD" />
+      <meta name="geo.placename" content="Lausanne" />
+      <meta name="geo.position" content="46.5196;6.6323" />
+      <meta name="ICBM" content="46.5196, 6.6323" />
+
+      {/* Balises pour l'accessibilité */}
+      <meta name="theme-color" content="#7790ED" />
+    </>
+  );
+}
+
 export default function ClientBody({
   children,
 }: {

@@ -20,22 +20,22 @@ export async function POST(request: Request) {
     // Récupérer les données validées
     const { lastName, firstName, email } = validationResult.data;
 
-    // CONFIGURATION POUR INFOMANIAK avec variables d'environnement (sécurisé)
+    // Configuration directe pour Infomaniak
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_SERVER || 'mail.infomaniak.com',
-      port: Number.parseInt(process.env.EMAIL_PORT || '587'),
+      host: 'mail.infomaniak.com',
+      port: 587,
       secure: false,
       auth: {
-        user: process.env.EMAIL_USER || 'contact@klikx.agency',
-        pass: process.env.EMAIL_PASSWORD, // Le mot de passe est stocké dans les variables d'environnement
+        user: 'clients@klikx.site',
+        pass: '9Y9iBydy7H!EmEPt',
       },
     });
 
     // Construction de l'email
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'contact@klikx.agency',
-      to: process.env.EMAIL_USER || 'contact@klikx.agency',  // Adresse de réception
-      replyTo: email,                  // Pour que les réponses aillent au contact
+      from: 'clients@klikx.site',
+      to: 'clients@klikx.site',  // Adresse de réception
+      replyTo: email,            // Pour que les réponses aillent au contact
       subject: `Nouveau message de ${firstName} ${lastName}`,
       text: `
         Nom: ${lastName}
@@ -51,15 +51,9 @@ export async function POST(request: Request) {
     };
 
     try {
-      // Tentative d'envoi d'email
-      // Désactivé en développement sauf si un mot de passe SMTP est configuré
-      if (process.env.EMAIL_PASSWORD) {
-        await transporter.sendMail(mailOptions);
-        console.log('Email envoyé avec succès');
-      } else {
-        console.log('Mode simulation: Email non envoyé car aucun mot de passe SMTP n\'est configuré');
-        console.log('Contenu de l\'email:', mailOptions);
-      }
+      // Envoi d'email
+      await transporter.sendMail(mailOptions);
+      console.log('Email envoyé avec succès');
     } catch (emailError) {
       // En cas d'erreur avec le serveur SMTP, on log l'erreur mais on continue
       console.error('Erreur d\'envoi d\'email:', emailError);
