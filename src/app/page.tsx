@@ -533,14 +533,14 @@ export default function Home() {
             <div className="col-span-12 lg:col-span-6">
               <TextReveal
                 text="PROCESSUS"
-                className="text-7xl sm:text-8xl font-bold mb-12 text-[#1c1c1c]"
+                className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl font-bold mb-12 text-[#1c1c1c]"
                 delay={0.2}
               />
               <div className="hidden lg:block h-96"></div>
               <div className="space-y-8 mt-auto">
                 <div>
                   <div className="flex mb-8">
-                    <div className="w-36 flex-shrink-0">
+                    <div className="w-12 sm:w-20 md:w-36 flex-shrink-0">
                       <div className="text-gray-400 text-xl font-light">01</div>
                     </div>
                     <div className="flex-1">
@@ -556,7 +556,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="flex mb-8">
-                    <div className="w-36 flex-shrink-0">
+                    <div className="w-12 sm:w-20 md:w-36 flex-shrink-0">
                       <div className="text-gray-400 text-xl font-light">02</div>
                     </div>
                     <div className="flex-1">
@@ -572,7 +572,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="flex mb-8">
-                    <div className="w-36 flex-shrink-0">
+                    <div className="w-12 sm:w-20 md:w-36 flex-shrink-0">
                       <div className="text-gray-400 text-xl font-light">03</div>
                     </div>
                     <div className="flex-1">
@@ -588,7 +588,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="flex mb-8">
-                    <div className="w-36 flex-shrink-0">
+                    <div className="w-12 sm:w-20 md:w-36 flex-shrink-0">
                       <div className="text-gray-400 text-xl font-light">04</div>
                     </div>
                     <div className="flex-1">
@@ -781,8 +781,8 @@ export default function Home() {
                   delay={0.2}
                 />
 
-                <div className="flex flex-nowrap items-center mb-12">
-                  <ScrollReveal delay={0.3} className="inline-flex">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center mb-12 space-y-3 sm:space-y-0">
+                  <ScrollReveal delay={0.3}>
                     <a
                       href="mailto:contact@klikx.agency"
                       className="inline-flex items-center bg-white/20 text-white px-4 py-2 rounded-full transition-colors group"
@@ -792,9 +792,11 @@ export default function Home() {
                         <FoundationArrow darkMode={false} size="small" />
                       </div>
                     </a>
+                  </ScrollReveal>
+                  <ScrollReveal delay={0.4}>
                     <a
                       href="tel:+41795232242"
-                      className="inline-flex items-center bg-white/20 text-white px-4 py-2 rounded-full transition-colors ml-2"
+                      className="inline-flex items-center bg-white/20 text-white px-4 py-2 rounded-full transition-colors sm:ml-2"
                     >
                       +41 79 523 22 42
                     </a>
