@@ -9,6 +9,7 @@ import Link from "next/link";
 import PricingTabs from "@/components/PricingTabs";
 import { useState } from "react";
 import { FoundationArrow } from "@/components/ui/FoundationArrow";
+import { AnimatedIPhone } from "@/components/ui/AnimatedIPhone";
 
 export default function Home() {
   const [activePlan, setActivePlan] = useState('premium');
@@ -115,12 +116,8 @@ export default function Home() {
                     borderRadius: '56px'
                   }}
                 ></div>
-                {/* iPhone principal au premier plan */}
-                <img
-                  src="/iphoneKlikx.svg"
-                  alt="iPhone Klikx"
-                  className="w-full h-auto relative z-10"
-                />
+                {/* iPhone animé au premier plan */}
+                <AnimatedIPhone className="w-full h-auto relative z-10" />
               </div>
             </div>
           </div>
