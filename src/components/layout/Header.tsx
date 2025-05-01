@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { useState, useRef } from "react";
+import { smoothScrollTo } from "@/utils/smoothScroll";
 
 const Header = () => {
   const navRef = useRef<HTMLDivElement>(null);
@@ -11,11 +12,11 @@ const Header = () => {
   const [isHovering, setIsHovering] = useState(false);
 
   const menuItems = [
-    { href: "/#accueil", label: "Accueil" },
-    { href: "/#a-propos", label: "À Propos" },
-    { href: "/#services", label: "Services" },
-    { href: "/#processus", label: "Processus" },
-    { href: "/#contact", label: "Contact" },
+    { href: "/#accueil", label: "Accueil", id: "accueil" },
+    { href: "/#a-propos", label: "À Propos", id: "a-propos" },
+    { href: "/#services", label: "Services", id: "services" },
+    { href: "/#processus", label: "Processus", id: "processus" },
+    { href: "/#contact", label: "Contact", id: "contact" },
   ];
 
   // Fonction pour suivre la position de la souris dans la navigation
@@ -68,11 +69,12 @@ const Header = () => {
           />
 
           <ul className="flex items-center justify-between relative z-10">
-            {menuItems.map((item, index) => (
-              <li key={index} className="relative py-1.5">
+            {menuItems.map((item) => (
+              <li key={item.id} className="relative py-1.5">
                 <a
                   href={item.href}
                   className="text-white text-[22px] font-medium relative"
+                  onClick={(e) => smoothScrollTo(e, item.id)}
                 >
                   {item.label}
                 </a>
@@ -92,8 +94,13 @@ const Header = () => {
           </SheetTrigger>
           <SheetContent side="right">
             <nav className="flex flex-col gap-4 mt-8">
-              {menuItems.map((item, index) => (
-                <a key={index} href={item.href} className="text-2xl font-medium">
+              {menuItems.map((item) => (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  className="text-2xl font-medium"
+                  onClick={(e) => smoothScrollTo(e, item.id)}
+                >
                   {item.label}
                 </a>
               ))}

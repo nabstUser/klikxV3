@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     // CONFIGURATION POUR INFOMANIAK avec variables d'environnement (sécurisé)
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_SERVER || 'mail.infomaniak.com',
-      port: parseInt(process.env.EMAIL_PORT || '587'),
+      port: Number.parseInt(process.env.EMAIL_PORT || '587'),
       secure: false,
       auth: {
         user: process.env.EMAIL_USER || 'contact@klikx.agency',

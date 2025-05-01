@@ -7,16 +7,87 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import PricingTabs from "@/components/PricingTabs";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FoundationArrow } from "@/components/ui/FoundationArrow";
 import { AnimatedIPhone } from "@/components/ui/AnimatedIPhone";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import TextReveal from "@/components/ui/TextReveal";
 import CountUp from "@/components/ui/CountUp";
 import ContactForm from "@/components/ContactForm";
+import ParallaxBackground from "@/components/ui/ParallaxBackground";
+import Image from "next/image";
+import { handleSmoothScroll } from "@/utils/smoothScroll";
+
+// Composant pour l'image About avec un effet de parallax simple
+const AboutImage = () => {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Calcul du décalage (mouvement léger)
+  const yOffset = scrollY * 0.03;
+
+  return (
+    <div className="relative h-[500px] flex items-center justify-center overflow-visible">
+      <div
+        className="w-full h-full relative"
+        style={{
+          transform: `translateY(${yOffset}px)`,
+          transition: 'transform 0.1s linear',
+          willChange: 'transform'
+        }}
+      >
+        <Image
+          src="/aboutSection.png"
+          alt="Modèle 3D isométrique d'une maison"
+          width={600}
+          height={400}
+          className="object-contain"
+          style={{ width: '100%', height: 'auto', maxWidth: '450px', margin: '0 auto' }}
+        />
+      </div>
+    </div>
+  );
+};
 
 export default function Home() {
   const [activePlan, setActivePlan] = useState('premium');
+
+  // Fonction pour initialiser les liens smooth scroll
+  useEffect(() => {
+    // Handler pour tous les liens internes
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a');
+
+      if (anchor?.getAttribute('href')?.startsWith('#')) {
+        e.preventDefault();
+        const href = anchor.getAttribute('href') || '';
+        handleSmoothScroll(href);
+      }
+      // Pour les liens Next.js avec /#hash
+      if (anchor?.getAttribute('href')?.startsWith('/#')) {
+        e.preventDefault();
+        const href = anchor.getAttribute('href')?.replace(/^\//, '') || '';
+        handleSmoothScroll(href.startsWith('#') ? href : `#${href}`);
+      }
+    };
+
+    // Ajout de l'écouteur d'événement
+    document.addEventListener('click', handleLinkClick);
+
+    // Nettoyage
+    return () => {
+      document.removeEventListener('click', handleLinkClick);
+    };
+  }, []);
 
   // Fonction pour gérer les changements de plan
   const handlePlanChange = (plan) => {
@@ -36,6 +107,7 @@ export default function Home() {
         return "/servicesPremium.png";
     }
   };
+
   return (
     <>
       <Header />
@@ -44,13 +116,13 @@ export default function Home() {
       <section
         id="accueil"
         className="relative w-full min-h-screen overflow-hidden text-lg"
-        style={{
-          backgroundImage: "url(/heroSection.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundColor: "#475569",
-        }}
+        style={{ backgroundColor: "#475569", position: "relative" }}
       >
+        {/* Parallax background - augmenter la force pour un effet plus prononcé */}
+        <div className="absolute inset-0 overflow-hidden" style={{ top: "-120px", bottom: "-100px", left: "-20px", right: "-20px" }}>
+          <ParallaxBackground src="/heroSection.jpg" strength={10} direction="up" />
+        </div>
+
         {/* Navigation et logo en haut - masqués sur les écrans medium et plus grands */}
         <div className="absolute w-full top-0 left-0 right-0 pt-6 px-8 z-40 md:hidden">
           <div className="flex justify-between items-center">
@@ -229,11 +301,7 @@ export default function Home() {
             </div>
             <div className="col-span-12 lg:col-span-5">
               <div className="w-full relative">
-                <img
-                  src="/aboutSection.png"
-                  alt="Modèle 3D isométrique d'une maison"
-                  className="w-full h-auto object-cover"
-                />
+                <AboutImage />
               </div>
             </div>
           </div>
@@ -436,31 +504,35 @@ export default function Home() {
             </div>
             <div className="col-span-12 lg:col-span-6">
               <div className="relative h-full">
-                <img
-                  src="/processSection.jpg"
-                  alt="Modèle 3D de maison"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <a href="#contact" className="bg-[#7790ED] p-10 text-white w-[400px] block cursor-pointer relative group">
-                    <div className="flex flex-col">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="text-2xl font-medium leading-tight">Commandez</div>
-                          <div className="text-4xl font-bold leading-tight text-[#292621]">Votre Modèle 3D</div>
-                        </div>
-                        <div className="mt-1 ml-4" style={{ color: '#292621' }}>
-                          <div style={{ transform: 'scale(1.5)' }}>
-                            <FoundationArrow darkMode={true} size="large" />
+                {/* Parallax effect for process section image - ajuster pour un effet plus visible */}
+                <div className="relative h-full" style={{ minHeight: "500px", overflow: "hidden" }}>
+                  <ParallaxBackground
+                    src="/processSection.jpg"
+                    strength={8}
+                    direction="up"
+                    className="scale-[1.4]"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center z-20">
+                    <a href="#contact" className="bg-[#7790ED] p-10 text-white w-[400px] block cursor-pointer relative group">
+                      <div className="flex flex-col">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="text-2xl font-medium leading-tight">Commandez</div>
+                            <div className="text-4xl font-bold leading-tight text-[#292621]">Votre Modèle 3D</div>
+                          </div>
+                          <div className="mt-1 ml-4" style={{ color: '#292621' }}>
+                            <div style={{ transform: 'scale(1.5)' }}>
+                              <FoundationArrow darkMode={true} size="large" />
+                            </div>
                           </div>
                         </div>
+                        <div className="mt-20 space-y-1">
+                          <div className="text-xl">Boostez vos annonces</div>
+                          <div className="text-xl font-medium">Maintenant</div>
+                        </div>
                       </div>
-                      <div className="mt-20 space-y-1">
-                        <div className="text-xl">Boostez vos annonces</div>
-                        <div className="text-xl font-medium">Maintenant</div>
-                      </div>
-                    </div>
-                  </a>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -583,12 +655,16 @@ export default function Home() {
       <section
         id="contact"
         className="min-h-screen relative overflow-hidden text-lg flex items-center"
-        style={{
-          backgroundImage: "url(/contactSection.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        style={{ backgroundColor: "#333" }}
       >
+        {/* Parallax background */}
+        <ParallaxBackground
+          src="/contactSection.jpg"
+          strength={9}
+          direction="up"
+          className="z-0 scale-[1.1]"
+        />
+
         <div className="container mx-auto px-4 z-10">
           <div className="grid grid-cols-12">
             {/* 5 colonnes vides pour l'image */}
